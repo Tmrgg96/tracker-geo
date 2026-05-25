@@ -84,11 +84,6 @@
     </div>
 
     <div class="card">
-      <div class="row">
-        <input id="token" type="text" placeholder="ADMIN_TOKEN" />
-        <button onclick="saveToken()">Сохранить токен</button>
-        <button class="ghost" onclick="checkAuth()">Проверить доступ</button>
-      </div>
       <div id="status" class="status"></div>
     </div>
 
@@ -138,12 +133,10 @@
     const statusEl = $('status');
 
     function api(path, options = {}) {
-      const token = $('token').value.trim();
       return fetch(path, {
         ...options,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
           ...(options.headers || {}),
         },
       }).then(async (r) => {
@@ -156,20 +149,6 @@
     function setStatus(msg, ok = true) {
       statusEl.textContent = msg;
       statusEl.className = `status ${ok ? 'ok' : 'err'}`;
-    }
-
-    function saveToken() {
-      localStorage.setItem('geo_tds_token', $('token').value.trim());
-      setStatus('Токен сохранён');
-    }
-
-    async function checkAuth() {
-      try {
-        await api('/api/admin/me');
-        setStatus('Доступ подтверждён');
-      } catch (e) {
-        setStatus(e.message, false);
-      }
     }
 
     function addLinkRow(link = {}) {
@@ -269,10 +248,8 @@
     }
 
     (function init() {
-      const saved = localStorage.getItem('geo_tds_token') || '';
-      $('token').value = saved;
       addLinkRow();
-      if (saved) loadCampaigns();
+      loadCampaigns();
     })();
   </script>
 </body>
