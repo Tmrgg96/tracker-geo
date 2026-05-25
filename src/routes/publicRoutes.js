@@ -2,21 +2,7 @@ const express = require('express');
 const geoip = require('geoip-lite');
 const { detectDevice } = require('../utils/deviceDetector');
 const { isBot } = require('../utils/botDetector');
-
-function pickWeightedUrl(candidates) {
-  if (!Array.isArray(candidates) || candidates.length === 0) return null;
-  if (candidates.length === 1) return candidates[0].url;
-
-  const totalWeight = candidates.reduce((acc, row) => acc + (Number(row.weight) || 100), 0);
-  let random = Math.random() * totalWeight;
-
-  for (const row of candidates) {
-    random -= Number(row.weight) || 100;
-    if (random <= 0) return row.url;
-  }
-
-  return candidates[candidates.length - 1].url;
-}
+const { selectRedirectUrl } = require('../utils/redirectSelector');
 
 function buildPublicRoutes(pool) {
   const router = express.Router();
@@ -65,21 +51,7 @@ function buildPublicRoutes(pool) {
       const countryCode = geo?.country || null;
       const deviceType = detectDevice(ua);
 
-      let redirectUrl = campaign.default_url;
-      if (countryCode) {
-        const linksResult = await pool.query(
-          `SELECT url, weight
-           FROM tds_campaign_links
-           WHERE campaign_id = $1
-             AND country_code = $2
-             AND (device_type = $3 OR device_type = 'all')`,
-          [campaign.id, countryCode, deviceType]
-        );
-
-        if (linksResult.rows.length > 0) {
-          redirectUrl = pickWeightedUrl(linksResult.rows) || campaign.default_url;
-        }
-      }
+      const { redirectUrl } = await selectRedirectUrl(pool, campaign, countryCode, deviceType);
 
       pool.query(
         `INSERT INTO tds_clicks (campaign_id, country_code, ip, user_agent, device_type, is_bot, redirect_url)
