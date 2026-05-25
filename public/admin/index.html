@@ -3,134 +3,632 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Geo TDS Tracker Admin</title>
+  <title>Geo TDS Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
-      --bg: #f7f8fa;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --primary: #0f766e;
-      --primary-2: #115e59;
-      --danger: #b91c1c;
+      --ink: #171513;
+      --muted: #6f6a61;
+      --paper: #f7f3ea;
+      --panel: #fffaf0;
+      --line: #ded4c4;
+      --black: #201d19;
+      --green: #0d7d61;
+      --green-ink: #063e32;
+      --red: #ba3a2f;
+      --blue: #2869a8;
+      --amber: #bd771d;
+      --shadow: 0 18px 60px rgba(45, 38, 29, 0.11);
+      --radius: 8px;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      padding: 24px;
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #f7f8fa 0%, #ecfdf5 100%);
-      color: var(--text);
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Archivo", "IBM Plex Sans", sans-serif;
+      background:
+        linear-gradient(90deg, rgba(32,29,25,0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+        linear-gradient(0deg, rgba(32,29,25,0.03) 1px, transparent 1px) 0 0 / 24px 24px,
+        radial-gradient(circle at 18% 8%, rgba(13,125,97,0.14), transparent 30%),
+        radial-gradient(circle at 88% 16%, rgba(189,119,29,0.16), transparent 34%),
+        var(--paper);
     }
-    .container { max-width: 1080px; margin: 0 auto; display: grid; gap: 16px; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 4px 24px rgba(17, 24, 39, 0.06);
+
+    button, input, select {
+      font: inherit;
     }
-    h1 { margin: 0; font-size: 1.4rem; }
-    .muted { color: var(--muted); font-size: 0.92rem; }
-    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    input, select, button {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-    }
-    input, select { background: #fff; min-width: 120px; }
-    input[type="url"], input[type="text"] { flex: 1 1 220px; }
+
     button {
+      min-height: 38px;
+      border: 1px solid var(--black);
+      border-radius: 6px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      color: var(--panel);
+      background: var(--black);
       cursor: pointer;
-      background: var(--primary);
-      color: #fff;
-      border: 1px solid var(--primary);
-      font-weight: 600;
+      font-weight: 700;
+      box-shadow: 3px 3px 0 rgba(32,29,25,0.16);
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
     }
-    button:hover { background: var(--primary-2); }
-    button.ghost {
-      background: #fff;
-      color: var(--text);
+
+    button:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0 rgba(32,29,25,0.15);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    button.icon {
+      width: 38px;
+      padding: 0;
+    }
+
+    button.secondary {
+      color: var(--ink);
+      background: #fffdf7;
+    }
+
+    button.success {
+      background: var(--green);
+      border-color: var(--green-ink);
+    }
+
+    button.danger {
+      background: var(--red);
+      border-color: #7e211b;
+    }
+
+    button.flat {
+      color: var(--ink);
+      background: transparent;
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    input, select {
+      min-height: 40px;
+      width: 100%;
       border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 10px;
+      color: var(--ink);
+      background: #fffdf7;
+      outline: none;
     }
-    button.danger { background: var(--danger); border-color: var(--danger); }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 10px 8px; font-size: 14px; }
-    th { color: var(--muted); font-weight: 600; }
-    code { background: #f3f4f6; border-radius: 8px; padding: 2px 6px; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .link-row {
+
+    input:focus, select:focus {
+      border-color: var(--black);
+      box-shadow: 0 0 0 3px rgba(13,125,97,0.13);
+    }
+
+    label {
       display: grid;
-      grid-template-columns: 90px 1fr 110px 90px 80px;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .shell {
+      width: min(1480px, calc(100vw - 28px));
+      margin: 18px auto 32px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 16px;
+    }
+
+    .brand, .metric, .panel {
+      border: 1px solid var(--black);
+      border-radius: var(--radius);
+      background: rgba(255,250,240,0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 46px);
+      line-height: 0.88;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(110px, 150px));
+      gap: 10px;
+    }
+
+    .metric {
+      padding: 14px;
+      min-height: 92px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font: 700 34px/1 "IBM Plex Mono", monospace;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 520px) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      overflow: hidden;
+    }
+
+    .panel-head {
+      min-height: 58px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(32,29,25,0.04);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 15px;
+      text-transform: uppercase;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .wide { grid-column: 1 / -1; }
+
+    .switches {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .switch {
+      min-height: 44px;
+      padding: 9px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fffdf7;
+      color: var(--ink);
+      text-transform: none;
+      font-size: 13px;
+    }
+
+    .switch input {
+      width: 19px;
+      min-height: 19px;
+      accent-color: var(--green);
+    }
+
+    .links-toolbar, .actions, .list-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .links-toolbar {
+      margin: 16px 0 8px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .rule {
+      display: grid;
+      grid-template-columns: 80px minmax(180px, 1fr) 110px 86px 38px;
       gap: 8px;
       margin-bottom: 8px;
+      align-items: start;
     }
-    .status { font-size: 13px; min-height: 18px; }
-    .status.ok { color: #166534; }
-    .status.err { color: #991b1b; }
-    @media (max-width: 900px) {
-      .grid2 { grid-template-columns: 1fr; }
-      .link-row { grid-template-columns: 1fr; }
+
+    .rule input, .rule select {
+      min-height: 38px;
+    }
+
+    .actions {
+      margin-top: 16px;
+      justify-content: flex-end;
+    }
+
+    .list-toolbar {
+      margin-bottom: 12px;
+    }
+
+    .list-toolbar input {
+      max-width: 360px;
+    }
+
+    .campaign-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .campaign {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) 120px 86px 86px auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,253,247,0.84);
+    }
+
+    .campaign.selected {
+      border-color: var(--black);
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .campaign-name {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .campaign-name strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mono {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .pill {
+      width: max-content;
+      max-width: 100%;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fffdf7;
+      font: 600 11px/1 "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+    }
+
+    .pill.on {
+      color: var(--green-ink);
+      border-color: rgba(13,125,97,0.35);
+      background: rgba(13,125,97,0.11);
+    }
+
+    .pill.off {
+      color: #7e211b;
+      border-color: rgba(186,58,47,0.28);
+      background: rgba(186,58,47,0.09);
+    }
+
+    .campaign-actions {
+      display: flex;
+      gap: 7px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.85fr) minmax(300px, 1.15fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .simulate-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .result-box {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px dashed var(--black);
+      border-radius: 8px;
+      background: rgba(40,105,168,0.07);
+      overflow-wrap: anywhere;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .stat-table th,
+    .stat-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .stat-table th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10;
+      max-width: min(440px, calc(100vw - 36px));
+      padding: 12px 14px;
+      border: 1px solid var(--black);
+      border-radius: 8px;
+      color: var(--panel);
+      background: var(--black);
+      box-shadow: 5px 5px 0 rgba(32,29,25,0.18);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .empty {
+      padding: 26px 14px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .spin {
+      animation: spin 900ms linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 1080px) {
+      .topbar, .workspace, .lower-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100vw - 16px, 1480px);
+        margin-top: 8px;
+      }
+
+      .brand, .panel-body, .panel-head {
+        padding: 12px;
+      }
+
+      .brand {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .metrics, .form-grid, .switches, .stats, .simulate-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .rule, .campaign {
+        grid-template-columns: 1fr;
+      }
+
+      .campaign-actions {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h1>Geo TDS Tracker</h1>
-      <div class="muted">Создавайте мультиссылки по GEO. Публичный формат: <code>/go/&lt;slug&gt;</code></div>
-    </div>
-
-    <div class="card">
-      <div id="status" class="status"></div>
-    </div>
-
-    <div class="card">
-      <h3>Новая кампания</h3>
-      <div class="grid2">
-        <input id="name" type="text" placeholder="Название" />
-        <input id="slug" type="text" placeholder="Slug (опционально)" />
-        <input id="default_url" type="url" placeholder="Default URL (fallback)" />
-        <input id="click_limit" type="number" placeholder="Click limit (опционально)" min="1" />
+  <main class="shell">
+    <section class="topbar">
+      <div class="brand">
+        <div>
+          <h1>Geo TDS<br>Tracker</h1>
+          <p>Мультиссылки с GEO/device правилами, fallback-потоком, статистикой и быстрым тестом маршрутизации.</p>
+        </div>
+        <button class="secondary" id="refreshBtn" title="Обновить список"><i data-lucide="refresh-cw"></i>Обновить</button>
       </div>
-      <div class="row" style="margin-top: 10px;">
-        <label><input id="is_active" type="checkbox" checked /> Active</label>
-        <label><input id="block_bots" type="checkbox" checked /> Block bots</label>
+      <div class="metrics">
+        <div class="metric"><span>Кампании</span><strong id="metricCampaigns">0</strong></div>
+        <div class="metric"><span>Переходы</span><strong id="metricClicks">0</strong></div>
+        <div class="metric"><span>24 часа</span><strong id="metric24h">0</strong></div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel">
+        <div class="panel-head">
+          <h2 id="formTitle">Новая мультиссылка</h2>
+          <button class="flat" id="resetBtn" title="Очистить форму"><i data-lucide="file-plus-2"></i>Новая</button>
+        </div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <label>Название<input id="name" type="text" placeholder="TikTok KZ/US campaign" autocomplete="off"></label>
+            <label>Slug<input id="slug" type="text" placeholder="geo-main" autocomplete="off"></label>
+            <label class="wide">Default URL<input id="default_url" type="url" placeholder="https://example.com/fallback"></label>
+            <label>Лимит кликов<input id="click_limit" type="number" min="1" placeholder="Без лимита"></label>
+            <label>Старт<input id="start_date" type="datetime-local"></label>
+            <label>Финиш<input id="end_date" type="datetime-local"></label>
+          </div>
+
+          <div class="switches">
+            <label class="switch"><span>Активна</span><input id="is_active" type="checkbox" checked></label>
+            <label class="switch"><span>Блокировать ботов</span><input id="block_bots" type="checkbox" checked></label>
+          </div>
+
+          <div class="links-toolbar">
+            <h3 class="section-title">GEO правила</h3>
+            <button class="secondary" id="addRuleBtn"><i data-lucide="plus"></i>Правило</button>
+          </div>
+          <div id="links"></div>
+
+          <div class="actions">
+            <button class="secondary" id="copyCurrentBtn"><i data-lucide="copy"></i>Скопировать Go URL</button>
+            <button class="success" id="saveBtn"><i data-lucide="save"></i>Сохранить</button>
+          </div>
+        </div>
       </div>
 
-      <h4>Country URLs</h4>
-      <div id="links"></div>
-      <button class="ghost" onclick="addLinkRow()">+ Добавить GEO ссылку</button>
-      <button onclick="createCampaign()">Создать кампанию</button>
-    </div>
-
-    <div class="card">
-      <div class="row" style="justify-content: space-between;">
-        <h3 style="margin:0;">Кампании</h3>
-        <button class="ghost" onclick="loadCampaigns()">Обновить</button>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Кампании</h2>
+          <span class="pill" id="selectedLabel">Ничего не выбрано</span>
+        </div>
+        <div class="panel-body">
+          <div class="list-toolbar">
+            <input id="search" type="search" placeholder="Поиск по названию или slug">
+            <button class="secondary" id="reloadBtn" title="Обновить"><i data-lucide="rotate-cw"></i>Reload</button>
+          </div>
+          <div id="campaigns" class="campaign-list"></div>
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Links</th>
-            <th>Clicks</th>
-            <th>Go URL</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="campaigns"></tbody>
-      </table>
-    </div>
-  </div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Симулятор</h2>
+          <span class="pill">без записи клика</span>
+        </div>
+        <div class="panel-body">
+          <div class="simulate-grid">
+            <label>Country<input id="simCountry" maxlength="3" placeholder="US или ANY" value="US"></label>
+            <label>Device
+              <select id="simDevice">
+                <option value="desktop">desktop</option>
+                <option value="mobile">mobile</option>
+                <option value="tablet">tablet</option>
+              </select>
+            </label>
+            <button id="simulateBtn"><i data-lucide="route"></i>Тест</button>
+          </div>
+          <div id="simulateResult" class="result-box muted">Выбери кампанию и проверь, куда поведет трафик.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Статистика</h2>
+          <button class="flat" id="statsBtn" title="Обновить статистику"><i data-lucide="bar-chart-3"></i>Обновить</button>
+        </div>
+        <div class="panel-body">
+          <div id="stats" class="empty">Выбери кампанию, чтобы увидеть клики по GEO и устройствам.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
 
   <script>
+    const state = {
+      campaigns: [],
+      selectedId: null,
+      editingId: null,
+    };
+
     const $ = (id) => document.getElementById(id);
-    const statusEl = $('status');
+
+    function icon(name, extra = '') {
+      return `<i data-lucide="${name}" ${extra}></i>`;
+    }
+
+    function refreshIcons() {
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+      }[char]));
+    }
 
     function api(path, options = {}) {
       return fetch(path, {
@@ -139,71 +637,145 @@
           'Content-Type': 'application/json',
           ...(options.headers || {}),
         },
-      }).then(async (r) => {
-        const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+      }).then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
         return data;
       });
     }
 
-    function setStatus(msg, ok = true) {
-      statusEl.textContent = msg;
-      statusEl.className = `status ${ok ? 'ok' : 'err'}`;
+    function toast(message, ok = true) {
+      const node = $('toast');
+      node.textContent = message;
+      node.style.background = ok ? 'var(--black)' : 'var(--red)';
+      node.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => node.classList.remove('show'), 3200);
     }
 
-    function addLinkRow(link = {}) {
+    function localDateTime(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function toApiDate(value) {
+      return value ? new Date(value).toISOString() : null;
+    }
+
+    function publicUrl(slug) {
+      return `${location.origin}/go/${slug}`;
+    }
+
+    function addRule(link = {}) {
       const wrap = document.createElement('div');
-      wrap.className = 'link-row';
+      wrap.className = 'rule';
       wrap.innerHTML = `
-        <input placeholder="US" maxlength="2" value="${link.country_code || ''}" />
-        <input type="url" placeholder="https://offer.example" value="${link.url || ''}" />
-        <select>
-          <option value="all" ${link.device_type === 'all' ? 'selected' : ''}>all</option>
-          <option value="desktop" ${link.device_type === 'desktop' ? 'selected' : ''}>desktop</option>
-          <option value="mobile" ${link.device_type === 'mobile' ? 'selected' : ''}>mobile</option>
-          <option value="tablet" ${link.device_type === 'tablet' ? 'selected' : ''}>tablet</option>
+        <input class="rule-country" placeholder="US/ANY" maxlength="3" value="${escapeHtml(link.country_code === '*' ? 'ANY' : link.country_code || '')}">
+        <input class="rule-url" type="url" placeholder="https://offer.example/path" value="${escapeHtml(link.url || '')}">
+        <select class="rule-device">
+          ${['all', 'desktop', 'mobile', 'tablet'].map((device) => `<option value="${device}" ${device === (link.device_type || 'all') ? 'selected' : ''}>${device}</option>`).join('')}
         </select>
-        <input type="number" min="1" value="${link.weight || 100}" />
-        <button type="button" class="danger" onclick="this.parentElement.remove()">Удалить</button>
+        <input class="rule-weight" type="number" min="1" value="${escapeHtml(link.weight || 100)}">
+        <button type="button" class="icon danger" title="Удалить правило">${icon('trash-2')}</button>
       `;
+      wrap.querySelector('button').addEventListener('click', () => wrap.remove());
       $('links').appendChild(wrap);
+      refreshIcons();
     }
 
     function collectLinks() {
-      const rows = [...document.querySelectorAll('#links .link-row')];
-      return rows.map((row) => {
-        const inputs = row.querySelectorAll('input, select');
-        return {
-          country_code: inputs[0].value.trim().toUpperCase(),
-          url: inputs[1].value.trim(),
-          device_type: inputs[2].value,
-          weight: Number(inputs[3].value || 100),
-        };
-      }).filter((x) => x.country_code && x.url);
+      return [...document.querySelectorAll('#links .rule')]
+        .map((row) => {
+          const country = row.querySelector('.rule-country').value.trim().toUpperCase();
+          return {
+            country_code: country === 'ANY' || country === 'ALL' ? '*' : country,
+            url: row.querySelector('.rule-url').value.trim(),
+            device_type: row.querySelector('.rule-device').value,
+            weight: Number(row.querySelector('.rule-weight').value || 100),
+          };
+        })
+        .filter((link) => link.country_code || link.url);
     }
 
-    async function createCampaign() {
+    function getPayload() {
+      return {
+        name: $('name').value.trim(),
+        slug: $('slug').value.trim(),
+        default_url: $('default_url').value.trim(),
+        click_limit: $('click_limit').value ? Number($('click_limit').value) : null,
+        start_date: toApiDate($('start_date').value),
+        end_date: toApiDate($('end_date').value),
+        is_active: $('is_active').checked,
+        block_bots: $('block_bots').checked,
+        links: collectLinks(),
+      };
+    }
+
+    function resetForm() {
+      state.editingId = null;
+      $('formTitle').textContent = 'Новая мультиссылка';
+      $('name').value = '';
+      $('slug').value = '';
+      $('default_url').value = '';
+      $('click_limit').value = '';
+      $('start_date').value = '';
+      $('end_date').value = '';
+      $('is_active').checked = true;
+      $('block_bots').checked = true;
+      $('links').innerHTML = '';
+      addRule({ country_code: 'ANY', device_type: 'all', weight: 100 });
+      renderCampaigns();
+    }
+
+    async function saveCampaign() {
       try {
-        const payload = {
-          name: $('name').value.trim(),
-          slug: $('slug').value.trim() || undefined,
-          default_url: $('default_url').value.trim(),
-          click_limit: $('click_limit').value ? Number($('click_limit').value) : null,
-          is_active: $('is_active').checked,
-          block_bots: $('block_bots').checked,
-          links: collectLinks(),
-        };
-        await api('/api/admin/tds/campaigns', { method: 'POST', body: JSON.stringify(payload) });
-        setStatus('Кампания создана');
-        $('name').value = '';
-        $('slug').value = '';
-        $('default_url').value = '';
-        $('click_limit').value = '';
+        const payload = getPayload();
+        const path = state.editingId ? `/api/admin/tds/campaigns/${state.editingId}` : '/api/admin/tds/campaigns';
+        const method = state.editingId ? 'PUT' : 'POST';
+        const data = await api(path, { method, body: JSON.stringify(payload) });
+        state.selectedId = data.campaign.id;
+        state.editingId = data.campaign.id;
+        toast('Кампания сохранена');
+        await loadCampaigns(false);
+        await loadStats();
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function editCampaign(id) {
+      try {
+        const data = await api(`/api/admin/tds/campaigns/${id}`);
+        state.selectedId = id;
+        state.editingId = id;
+        $('formTitle').textContent = `Редактирование #${id}`;
+        $('name').value = data.campaign.name || '';
+        $('slug').value = data.campaign.slug || '';
+        $('default_url').value = data.campaign.default_url || '';
+        $('click_limit').value = data.campaign.click_limit || '';
+        $('start_date').value = localDateTime(data.campaign.start_date);
+        $('end_date').value = localDateTime(data.campaign.end_date);
+        $('is_active').checked = Boolean(data.campaign.is_active);
+        $('block_bots').checked = Boolean(data.campaign.block_bots);
         $('links').innerHTML = '';
-        addLinkRow();
-        loadCampaigns();
-      } catch (e) {
-        setStatus(e.message, false);
+        (data.links.length ? data.links : [{ country_code: 'ANY', device_type: 'all', weight: 100 }]).forEach(addRule);
+        $('selectedLabel').textContent = data.campaign.slug;
+        renderCampaigns();
+        await loadStats();
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function copyText(text, label = 'Скопировано') {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast(label);
+      } catch (_error) {
+        toast('Clipboard недоступен в браузере', false);
       }
     }
 
@@ -211,46 +783,189 @@
       if (!confirm(`Удалить кампанию #${id}?`)) return;
       try {
         await api(`/api/admin/tds/campaigns/${id}`, { method: 'DELETE' });
-        setStatus('Кампания удалена');
-        loadCampaigns();
-      } catch (e) {
-        setStatus(e.message, false);
+        if (state.selectedId === id) {
+          state.selectedId = null;
+          resetForm();
+          $('stats').className = 'empty';
+          $('stats').textContent = 'Выбери кампанию, чтобы увидеть клики по GEO и устройствам.';
+        }
+        toast('Кампания удалена');
+        await loadCampaigns(false);
+      } catch (error) {
+        toast(error.message, false);
       }
     }
 
-    async function loadCampaigns() {
-      const tbody = $('campaigns');
-      tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+    async function duplicateCampaign(id) {
+      try {
+        const data = await api(`/api/admin/tds/campaigns/${id}/duplicate`, { method: 'POST', body: '{}' });
+        toast('Копия создана и оставлена выключенной');
+        await loadCampaigns(false);
+        await editCampaign(data.campaign.id);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function toggleCampaign(id, value) {
+      try {
+        await api(`/api/admin/tds/campaigns/${id}/status`, { method: 'PATCH', body: JSON.stringify({ is_active: value }) });
+        await loadCampaigns(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function updateMetrics() {
+      const clicks = state.campaigns.reduce((sum, item) => sum + Number(item.click_count || 0), 0);
+      const clicks24 = state.campaigns.reduce((sum, item) => sum + Number(item.clicks_24h || 0), 0);
+      $('metricCampaigns').textContent = state.campaigns.length;
+      $('metricClicks').textContent = clicks;
+      $('metric24h').textContent = clicks24;
+    }
+
+    function renderCampaigns() {
+      const query = $('search').value.trim().toLowerCase();
+      const list = state.campaigns.filter((campaign) => {
+        return !query || campaign.name.toLowerCase().includes(query) || campaign.slug.toLowerCase().includes(query);
+      });
+      const node = $('campaigns');
+
+      if (!list.length) {
+        node.innerHTML = '<div class="empty">Кампаний нет или поиск ничего не нашел.</div>';
+        return;
+      }
+
+      node.innerHTML = list.map((campaign) => {
+        const isSelected = Number(campaign.id) === Number(state.selectedId);
+        const goUrl = publicUrl(campaign.slug);
+        return `
+          <article class="campaign ${isSelected ? 'selected' : ''}">
+            <div class="campaign-name">
+              <strong>${escapeHtml(campaign.name)}</strong>
+              <span class="mono muted">${escapeHtml(campaign.slug)}</span>
+            </div>
+            <span class="pill ${campaign.is_active ? 'on' : 'off'}">${campaign.is_active ? 'active' : 'paused'}</span>
+            <span class="mono">${Number(campaign.link_count || 0)} rules</span>
+            <span class="mono">${Number(campaign.click_count || 0)} clicks</span>
+            <div class="campaign-actions">
+              <button class="icon secondary" title="Редактировать" data-action="edit" data-id="${campaign.id}">${icon('square-pen')}</button>
+              <button class="icon secondary" title="Скопировать ссылку" data-action="copy" data-url="${escapeHtml(goUrl)}">${icon('copy')}</button>
+              <button class="icon secondary" title="Открыть" data-action="open" data-url="${escapeHtml(goUrl)}">${icon('external-link')}</button>
+              <button class="icon secondary" title="Дублировать" data-action="duplicate" data-id="${campaign.id}">${icon('copy-plus')}</button>
+              <button class="icon ${campaign.is_active ? 'secondary' : 'success'}" title="${campaign.is_active ? 'Поставить на паузу' : 'Включить'}" data-action="toggle" data-id="${campaign.id}" data-value="${campaign.is_active ? 'false' : 'true'}">${icon(campaign.is_active ? 'pause' : 'play')}</button>
+              <button class="icon danger" title="Удалить" data-action="delete" data-id="${campaign.id}">${icon('trash-2')}</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    async function loadCampaigns(showToast = true) {
+      $('reloadBtn').disabled = true;
       try {
         const data = await api('/api/admin/tds/campaigns');
-        if (!data.campaigns.length) {
-          tbody.innerHTML = '<tr><td colspan="7">Нет кампаний</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = data.campaigns.map((c) => {
-          const url = `${location.origin}/go/${c.slug}`;
-          return `
-            <tr>
-              <td>${c.id}</td>
-              <td>${c.name}</td>
-              <td><code>${c.slug}</code></td>
-              <td>${c.link_count}</td>
-              <td>${c.click_count}</td>
-              <td><a href="${url}" target="_blank">${url}</a></td>
-              <td><button class="danger" onclick="deleteCampaign(${c.id})">Delete</button></td>
-            </tr>
-          `;
-        }).join('');
-      } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="7">${e.message}</td></tr>`;
+        state.campaigns = data.campaigns || [];
+        updateMetrics();
+        renderCampaigns();
+        if (showToast) toast('Данные обновлены');
+      } catch (error) {
+        toast(error.message, false);
+      } finally {
+        $('reloadBtn').disabled = false;
       }
     }
 
-    (function init() {
-      addLinkRow();
-      loadCampaigns();
-    })();
+    async function simulate() {
+      if (!state.selectedId) {
+        toast('Сначала выбери кампанию', false);
+        return;
+      }
+
+      try {
+        const country = encodeURIComponent($('simCountry').value.trim() || 'ANY');
+        const device = encodeURIComponent($('simDevice').value);
+        const data = await api(`/api/admin/tds/campaigns/${state.selectedId}/simulate?country=${country}&device=${device}`);
+        const result = data.result;
+        $('simulateResult').className = 'result-box';
+        $('simulateResult').innerHTML = `
+          <div class="mono">${escapeHtml(result.country_code)} / ${escapeHtml(result.device_type)}</div>
+          <strong>${result.used_default ? 'Default URL' : 'Matched rule'}</strong>
+          <div><a href="${escapeHtml(result.redirect_url)}" target="_blank" rel="noreferrer">${escapeHtml(result.redirect_url)}</a></div>
+        `;
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function loadStats() {
+      if (!state.selectedId) {
+        toast('Сначала выбери кампанию', false);
+        return;
+      }
+
+      try {
+        const data = await api(`/api/admin/tds/campaigns/${state.selectedId}/stats`);
+        const stats = data.stats;
+        $('stats').className = 'stats';
+        $('stats').innerHTML = `
+          <div>
+            <div class="metric" style="min-height:74px; box-shadow:none;"><span>Total</span><strong>${stats.total}</strong></div>
+            <table class="stat-table">
+              <thead><tr><th>Country</th><th>Clicks</th></tr></thead>
+              <tbody>${(stats.byCountry || []).map((row) => `<tr><td>${escapeHtml(row.country_code)}</td><td>${row.clicks}</td></tr>`).join('') || '<tr><td colspan="2">Нет данных</td></tr>'}</tbody>
+            </table>
+          </div>
+          <div>
+            <div class="metric" style="min-height:74px; box-shadow:none;"><span>24 hours</span><strong>${stats.last24h}</strong></div>
+            <table class="stat-table">
+              <thead><tr><th>Device</th><th>Clicks</th></tr></thead>
+              <tbody>${(stats.byDevice || []).map((row) => `<tr><td>${escapeHtml(row.device_type)}</td><td>${row.clicks}</td></tr>`).join('') || '<tr><td colspan="2">Нет данных</td></tr>'}</tbody>
+            </table>
+          </div>
+          <div class="wide">
+            <table class="stat-table">
+              <thead><tr><th>Recent</th><th>Redirect</th></tr></thead>
+              <tbody>${(stats.recent || []).map((row) => `<tr><td class="mono">${escapeHtml(row.country_code || 'N/A')} / ${escapeHtml(row.device_type || 'unknown')}</td><td>${escapeHtml(row.redirect_url || '')}</td></tr>`).join('') || '<tr><td colspan="2">Нет кликов</td></tr>'}</tbody>
+            </table>
+          </div>
+        `;
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    $('saveBtn').addEventListener('click', saveCampaign);
+    $('resetBtn').addEventListener('click', resetForm);
+    $('addRuleBtn').addEventListener('click', () => addRule({ country_code: 'ANY', device_type: 'all', weight: 100 }));
+    $('reloadBtn').addEventListener('click', () => loadCampaigns());
+    $('refreshBtn').addEventListener('click', () => loadCampaigns());
+    $('search').addEventListener('input', renderCampaigns);
+    $('simulateBtn').addEventListener('click', simulate);
+    $('statsBtn').addEventListener('click', loadStats);
+    $('copyCurrentBtn').addEventListener('click', () => {
+      const slug = $('slug').value.trim();
+      if (!slug) return toast('Slug пока пустой', false);
+      return copyText(publicUrl(slug), 'Go URL скопирован');
+    });
+
+    $('campaigns').addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      const action = button.dataset.action;
+      const id = Number(button.dataset.id);
+      if (action === 'edit') return editCampaign(id);
+      if (action === 'copy') return copyText(button.dataset.url, 'Go URL скопирован');
+      if (action === 'open') return window.open(button.dataset.url, '_blank', 'noopener,noreferrer');
+      if (action === 'duplicate') return duplicateCampaign(id);
+      if (action === 'toggle') return toggleCampaign(id, button.dataset.value === 'true');
+      if (action === 'delete') return deleteCampaign(id);
+    });
+
+    resetForm();
+    loadCampaigns(false);
+    refreshIcons();
   </script>
 </body>
 </html>
