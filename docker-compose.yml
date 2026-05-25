@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    container_name: geo-tds-tracker
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      NODE_ENV: production
+      DATABASE_URL: postgresql://tracker:tracker@postgres:5432/tracker
+      ADMIN_TOKEN: change-me-strong-token
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: geo-tds-postgres
+    environment:
+      POSTGRES_DB: tracker
+      POSTGRES_USER: tracker
+      POSTGRES_PASSWORD: tracker
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

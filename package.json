@@ -1,0 +1,22 @@
+{
+  "name": "geo-tds-tracker",
+  "version": "1.0.0",
+  "description": "Standalone geo tracker with multi-link routing by country",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "geoip-lite": "^1.4.10",
+    "pg": "^8.17.2",
+    "ua-parser-js": "^2.0.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
