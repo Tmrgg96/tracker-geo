@@ -280,7 +280,10 @@
 
     .rule {
       display: grid;
-      grid-template-columns: 80px minmax(180px, 1fr) 110px 86px 38px;
+      grid-template-columns: minmax(150px, 0.95fr) minmax(0, 1.35fr) 42px;
+      grid-template-areas:
+        "country url delete"
+        "device weight delete";
       gap: 8px;
       margin-bottom: 8px;
       align-items: start;
@@ -288,6 +291,16 @@
 
     .rule input, .rule select {
       min-height: 38px;
+    }
+
+    .rule-country { grid-area: country; }
+    .rule-url { grid-area: url; }
+    .rule-device { grid-area: device; }
+    .rule-weight { grid-area: weight; }
+    .rule-delete {
+      grid-area: delete;
+      width: 42px;
+      height: 86px;
     }
 
     .actions {
@@ -491,8 +504,21 @@
         grid-template-columns: 1fr;
       }
 
-      .rule, .campaign {
+      .campaign {
         grid-template-columns: 1fr;
+      }
+
+      .rule {
+        grid-template-columns: 1fr 42px;
+        grid-template-areas:
+          "country delete"
+          "url url"
+          "device device"
+          "weight weight";
+      }
+
+      .rule-delete {
+        height: 40px;
       }
 
       .campaign-actions {
@@ -530,8 +556,6 @@
             <label>Slug<input id="slug" type="text" placeholder="geo-main" autocomplete="off"></label>
             <label class="wide">Default URL<input id="default_url" type="url" placeholder="https://example.com/fallback"></label>
             <label>Лимит кликов<input id="click_limit" type="number" min="1" placeholder="Без лимита"></label>
-            <label>Старт<input id="start_date" type="datetime-local"></label>
-            <label>Финиш<input id="end_date" type="datetime-local"></label>
           </div>
 
           <div class="switches">
@@ -653,33 +677,61 @@
       window.__toastTimer = setTimeout(() => node.classList.remove('show'), 3200);
     }
 
-    function localDateTime(value) {
-      if (!value) return '';
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return '';
-      const pad = (num) => String(num).padStart(2, '0');
-      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-    }
-
-    function toApiDate(value) {
-      return value ? new Date(value).toISOString() : null;
-    }
-
     function publicUrl(slug) {
       return `${location.origin}/go/${slug}`;
+    }
+
+    const COUNTRY_CODES = [
+      '*', 'AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'AO', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AW', 'AX', 'AZ',
+      'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BL', 'BM', 'BN', 'BO', 'BQ', 'BR', 'BS', 'BT',
+      'BV', 'BW', 'BY', 'BZ', 'CA', 'CC', 'CD', 'CF', 'CG', 'CH', 'CI', 'CK', 'CL', 'CM', 'CN', 'CO', 'CR',
+      'CU', 'CV', 'CW', 'CX', 'CY', 'CZ', 'DE', 'DJ', 'DK', 'DM', 'DO', 'DZ', 'EC', 'EE', 'EG', 'EH', 'ER',
+      'ES', 'ET', 'FI', 'FJ', 'FK', 'FM', 'FO', 'FR', 'GA', 'GB', 'GD', 'GE', 'GF', 'GG', 'GH', 'GI', 'GL',
+      'GM', 'GN', 'GP', 'GQ', 'GR', 'GS', 'GT', 'GU', 'GW', 'GY', 'HK', 'HM', 'HN', 'HR', 'HT', 'HU', 'ID',
+      'IE', 'IL', 'IM', 'IN', 'IO', 'IQ', 'IR', 'IS', 'IT', 'JE', 'JM', 'JO', 'JP', 'KE', 'KG', 'KH', 'KI',
+      'KM', 'KN', 'KP', 'KR', 'KW', 'KY', 'KZ', 'LA', 'LB', 'LC', 'LI', 'LK', 'LR', 'LS', 'LT', 'LU', 'LV',
+      'LY', 'MA', 'MC', 'MD', 'ME', 'MF', 'MG', 'MH', 'MK', 'ML', 'MM', 'MN', 'MO', 'MP', 'MQ', 'MR', 'MS',
+      'MT', 'MU', 'MV', 'MW', 'MX', 'MY', 'MZ', 'NA', 'NC', 'NE', 'NF', 'NG', 'NI', 'NL', 'NO', 'NP', 'NR',
+      'NU', 'NZ', 'OM', 'PA', 'PE', 'PF', 'PG', 'PH', 'PK', 'PL', 'PM', 'PN', 'PR', 'PS', 'PT', 'PW', 'PY',
+      'QA', 'RE', 'RO', 'RS', 'RU', 'RW', 'SA', 'SB', 'SC', 'SD', 'SE', 'SG', 'SH', 'SI', 'SJ', 'SK', 'SL',
+      'SM', 'SN', 'SO', 'SR', 'SS', 'ST', 'SV', 'SX', 'SY', 'SZ', 'TC', 'TD', 'TF', 'TG', 'TH', 'TJ', 'TK',
+      'TL', 'TM', 'TN', 'TO', 'TR', 'TT', 'TV', 'TW', 'TZ', 'UA', 'UG', 'UM', 'US', 'UY', 'UZ', 'VA', 'VC',
+      'VE', 'VG', 'VI', 'VN', 'VU', 'WF', 'WS', 'YE', 'YT', 'ZA', 'ZM', 'ZW'
+    ];
+    const countryNames = typeof Intl !== 'undefined' && Intl.DisplayNames
+      ? new Intl.DisplayNames(['ru'], { type: 'region' })
+      : null;
+
+    function normalizeCountryValue(value) {
+      const code = String(value || '').trim().toUpperCase();
+      if (!code || code === '*' || code === 'ANY' || code === 'ALL') return '*';
+      return code;
+    }
+
+    function countryLabel(code) {
+      if (code === '*') return 'ANY - Любая страна';
+      const name = countryNames?.of(code) || code;
+      return `${code} - ${name}`;
+    }
+
+    function countryOptions(selectedValue) {
+      const selected = normalizeCountryValue(selectedValue);
+      return COUNTRY_CODES.map((code) => (
+        `<option value="${code}" ${code === selected ? 'selected' : ''}>${escapeHtml(countryLabel(code))}</option>`
+      )).join('');
     }
 
     function addRule(link = {}) {
       const wrap = document.createElement('div');
       wrap.className = 'rule';
       wrap.innerHTML = `
-        <input class="rule-country" placeholder="US/ANY" maxlength="3" value="${escapeHtml(link.country_code === '*' ? 'ANY' : link.country_code || '')}">
+        <select class="rule-country">${countryOptions(link.country_code)}</select>
         <input class="rule-url" type="url" placeholder="https://offer.example/path" value="${escapeHtml(link.url || '')}">
         <select class="rule-device">
           ${['all', 'desktop', 'mobile', 'tablet'].map((device) => `<option value="${device}" ${device === (link.device_type || 'all') ? 'selected' : ''}>${device}</option>`).join('')}
         </select>
         <input class="rule-weight" type="number" min="1" value="${escapeHtml(link.weight || 100)}">
-        <button type="button" class="icon danger" title="Удалить правило">${icon('trash-2')}</button>
+        <button type="button" class="icon danger rule-delete" title="Удалить правило">${icon('trash-2')}</button>
       `;
       wrap.querySelector('button').addEventListener('click', () => wrap.remove());
       $('links').appendChild(wrap);
@@ -689,9 +741,9 @@
     function collectLinks() {
       return [...document.querySelectorAll('#links .rule')]
         .map((row) => {
-          const country = row.querySelector('.rule-country').value.trim().toUpperCase();
+          const country = normalizeCountryValue(row.querySelector('.rule-country').value);
           return {
-            country_code: country === 'ANY' || country === 'ALL' ? '*' : country,
+            country_code: country,
             url: row.querySelector('.rule-url').value.trim(),
             device_type: row.querySelector('.rule-device').value,
             weight: Number(row.querySelector('.rule-weight').value || 100),
@@ -706,8 +758,8 @@
         slug: $('slug').value.trim(),
         default_url: $('default_url').value.trim(),
         click_limit: $('click_limit').value ? Number($('click_limit').value) : null,
-        start_date: toApiDate($('start_date').value),
-        end_date: toApiDate($('end_date').value),
+        start_date: null,
+        end_date: null,
         is_active: $('is_active').checked,
         block_bots: $('block_bots').checked,
         links: collectLinks(),
@@ -721,8 +773,6 @@
       $('slug').value = '';
       $('default_url').value = '';
       $('click_limit').value = '';
-      $('start_date').value = '';
-      $('end_date').value = '';
       $('is_active').checked = true;
       $('block_bots').checked = true;
       $('links').innerHTML = '';
@@ -756,8 +806,6 @@
         $('slug').value = data.campaign.slug || '';
         $('default_url').value = data.campaign.default_url || '';
         $('click_limit').value = data.campaign.click_limit || '';
-        $('start_date').value = localDateTime(data.campaign.start_date);
-        $('end_date').value = localDateTime(data.campaign.end_date);
         $('is_active').checked = Boolean(data.campaign.is_active);
         $('block_bots').checked = Boolean(data.campaign.block_bots);
         $('links').innerHTML = '';
