@@ -566,7 +566,6 @@
           <h2 id="pageTitle">Dashboard</h2>
           <p id="pageDescription">Быстрый обзор трафика, конверсий и состояния кампаний. Если новые backend endpoints еще не готовы, блоки покажут fallback вместо падения интерфейса.</p>
         </div>
-        <div class="top-actions" id="pageActions"></div>
       </header>
 
       <section id="tab-dashboard" class="tab-panel active">
@@ -1006,26 +1005,7 @@
       $('pageEyebrow').textContent = eyebrow;
       $('pageTitle').textContent = title;
       $('pageDescription').textContent = description;
-      renderPageActions(tab);
       refreshIcons();
-    }
-
-    function renderPageActions(tab) {
-      const actions = {
-        dashboard: `<button class="secondary" id="actionRefreshDashboard">${icon('refresh-cw')}Обновить</button>`,
-        campaigns: `<button class="success" id="actionNewCampaign">${icon('plus')}Новая кампания</button>`,
-        offers: `<button class="success" id="actionNewOffer">${icon('plus')}Новый оффер</button>`,
-        sources: `<button class="success" id="actionNewSource">${icon('plus')}Новый источник</button>`,
-        reports: `<button class="secondary" id="actionRefreshReports">${icon('refresh-cw')}Обновить отчеты</button>`,
-        tools: `<button class="secondary" id="actionCopyPostback">${icon('copy')}Postback URL</button>`,
-      };
-      $('pageActions').innerHTML = actions[tab] || '';
-      $('actionRefreshDashboard')?.addEventListener('click', loadDashboardData);
-      $('actionNewCampaign')?.addEventListener('click', () => openCampaignEditor());
-      $('actionNewOffer')?.addEventListener('click', () => openOfferEditor());
-      $('actionNewSource')?.addEventListener('click', () => openSourceEditor());
-      $('actionRefreshReports')?.addEventListener('click', loadReports);
-      $('actionCopyPostback')?.addEventListener('click', () => copyText(`${location.origin}/postback?subid={click_id}&status=lead&payout={payout}&tid={transaction_id}`, 'Postback URL скопирован'));
     }
 
     function apiState(message, isError = false) {
@@ -1716,7 +1696,6 @@
     });
 
     initStaticSelects();
-    renderPageActions('dashboard');
     renderAll();
     refreshAll();
   </script>
