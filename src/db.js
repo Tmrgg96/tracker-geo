@@ -182,6 +182,13 @@ async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_tds_offers_created_at ON tds_offers(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_tds_traffic_sources_created_at ON tds_traffic_sources(created_at DESC);
   `);
+
+  await pool.query(`
+    DELETE FROM tds_conversions cv
+    WHERE NOT EXISTS (
+      SELECT 1 FROM tds_clicks clk WHERE clk.click_id = cv.click_id
+    )
+  `);
 }
 
 module.exports = {

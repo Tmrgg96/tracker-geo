@@ -521,13 +521,23 @@ function buildAdminRoutes(pool) {
   });
 
   router.delete('/api/admin/tds/campaigns/:id', adminAuth, async (req, res) => {
+    const client = await pool.connect();
     try {
-      const result = await pool.query('DELETE FROM tds_campaigns WHERE id = $1 RETURNING *', [req.params.id]);
-      if (!result.rows.length) return res.status(404).json({ success: false, error: 'Campaign not found' });
+      await client.query('BEGIN');
+      await client.query('DELETE FROM tds_conversions WHERE campaign_id = $1', [req.params.id]);
+      const result = await client.query('DELETE FROM tds_campaigns WHERE id = $1 RETURNING *', [req.params.id]);
+      if (!result.rows.length) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ success: false, error: 'Campaign not found' });
+      }
+      await client.query('COMMIT');
       return res.json({ success: true, deleted: result.rows[0] });
     } catch (error) {
+      await client.query('ROLLBACK');
       console.error('Delete campaign error:', error);
       return res.status(500).json({ success: false, error: 'Failed to delete campaign' });
+    } finally {
+      client.release();
     }
   });
 
