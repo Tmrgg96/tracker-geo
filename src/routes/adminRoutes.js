@@ -94,6 +94,21 @@ function parseCampaignPayload(body, options = {}) {
   };
 }
 
+function parseOfferPayload(body) {
+  const name = String(body.name || '').trim();
+
+  if (!name) {
+    const error = new Error('Offer name is required');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return {
+    name,
+    url: assertHttpUrl(body.url, 'Offer URL'),
+  };
+}
+
 async function fetchCampaign(pool, id) {
   const result = await pool.query('SELECT * FROM tds_campaigns WHERE id = $1', [id]);
   return result.rows[0] || null;
@@ -104,6 +119,67 @@ function buildAdminRoutes(pool) {
 
   router.get('/api/admin/me', adminAuth, (_req, res) => {
     res.json({ success: true });
+  });
+
+  router.get('/api/admin/tds/offers', adminAuth, async (_req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM tds_offers ORDER BY created_at DESC');
+      res.json({ success: true, offers: result.rows });
+    } catch (error) {
+      console.error('List offers error:', error);
+      res.status(500).json({ success: false, error: 'Failed to list offers' });
+    }
+  });
+
+  router.post('/api/admin/tds/offers', adminAuth, async (req, res) => {
+    try {
+      const payload = parseOfferPayload(req.body);
+      const result = await pool.query(
+        `INSERT INTO tds_offers (name, url)
+         VALUES ($1, $2)
+         RETURNING *`,
+        [payload.name, payload.url]
+      );
+      res.json({ success: true, offer: result.rows[0] });
+    } catch (error) {
+      console.error('Create offer error:', error);
+      res.status(error.statusCode || 500).json({ success: false, error: error.message || 'Failed to create offer' });
+    }
+  });
+
+  router.put('/api/admin/tds/offers/:id', adminAuth, async (req, res) => {
+    try {
+      const payload = parseOfferPayload(req.body);
+      const result = await pool.query(
+        `UPDATE tds_offers
+         SET name = $1, url = $2, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $3
+         RETURNING *`,
+        [payload.name, payload.url, req.params.id]
+      );
+
+      if (!result.rows.length) {
+        return res.status(404).json({ success: false, error: 'Offer not found' });
+      }
+
+      res.json({ success: true, offer: result.rows[0] });
+    } catch (error) {
+      console.error('Update offer error:', error);
+      res.status(error.statusCode || 500).json({ success: false, error: error.message || 'Failed to update offer' });
+    }
+  });
+
+  router.delete('/api/admin/tds/offers/:id', adminAuth, async (req, res) => {
+    try {
+      const result = await pool.query('DELETE FROM tds_offers WHERE id = $1 RETURNING *', [req.params.id]);
+      if (!result.rows.length) {
+        return res.status(404).json({ success: false, error: 'Offer not found' });
+      }
+      res.json({ success: true, deleted: result.rows[0] });
+    } catch (error) {
+      console.error('Delete offer error:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete offer' });
+    }
   });
 
   router.get('/api/admin/tds/campaigns', adminAuth, async (_req, res) => {
