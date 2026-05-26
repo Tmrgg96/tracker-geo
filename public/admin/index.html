@@ -9,74 +9,1716 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    :root{--ink:#171513;--muted:#6f6a61;--paper:#f7f3ea;--panel:#fffaf0;--line:#ded4c4;--black:#201d19;--green:#0d7d61;--green-ink:#063e32;--red:#ba3a2f;--shadow:0 18px 60px rgba(45,38,29,.11);--radius:8px}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font-family:Archivo,sans-serif;background:linear-gradient(90deg,rgba(32,29,25,.035) 1px,transparent 1px) 0 0/24px 24px,linear-gradient(0deg,rgba(32,29,25,.03) 1px,transparent 1px) 0 0/24px 24px,radial-gradient(circle at 18% 8%,rgba(13,125,97,.14),transparent 30%),radial-gradient(circle at 88% 16%,rgba(189,119,29,.16),transparent 34%),var(--paper)}button,input,select{font:inherit}button{min-height:38px;border:1px solid var(--black);border-radius:6px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:7px;color:var(--panel);background:var(--black);cursor:pointer;font-weight:700;box-shadow:3px 3px 0 rgba(32,29,25,.16);transition:140ms ease}button:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(32,29,25,.15)}button.icon{width:38px;padding:0}button.secondary{color:var(--ink);background:#fffdf7}button.success{background:var(--green);border-color:var(--green-ink)}button.danger{background:var(--red);border-color:#7e211b}button.flat{color:var(--ink);background:transparent;border-color:var(--line);box-shadow:none}input,select{min-height:40px;width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 10px;color:var(--ink);background:#fffdf7;outline:none}input:focus,select:focus{border-color:var(--black);box-shadow:0 0 0 3px rgba(13,125,97,.13)}label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase}.shell{width:min(1480px,calc(100vw - 28px));margin:18px auto 32px}.topbar{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:16px;margin-bottom:16px}.brand,.metric,.panel{border:1px solid var(--black);border-radius:var(--radius);background:rgba(255,250,240,.92);box-shadow:var(--shadow)}.brand{padding:18px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand h1{margin:0;font-size:clamp(26px,4vw,46px);line-height:.88;text-transform:uppercase}.brand p{margin:8px 0 0;max-width:620px;color:var(--muted);font-size:14px;line-height:1.35}.metrics{display:grid;grid-template-columns:repeat(3,minmax(110px,150px));gap:10px}.metric{padding:14px;min-height:92px}.metric span{display:block;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase}.metric strong{display:block;margin-top:8px;font:700 34px/1 'IBM Plex Mono',monospace}.workspace{display:grid;grid-template-columns:minmax(360px,520px) minmax(0,1fr);gap:16px;align-items:start}.panel{overflow:hidden}.panel-head{min-height:58px;padding:14px 16px;border-bottom:1px solid var(--black);display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(32,29,25,.04)}.panel-head h2{margin:0;font-size:15px;text-transform:uppercase}.panel-body{padding:16px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.wide{grid-column:1/-1}.switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}.switch{min-height:44px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:6px;background:#fffdf7;color:var(--ink);text-transform:none;font-size:13px}.switch input{width:19px;min-height:19px;accent-color:var(--green)}.links-toolbar,.actions,.list-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.links-toolbar{margin:16px 0 8px}.section-title{margin:0;font-size:13px;text-transform:uppercase}.rule{display:grid;grid-template-columns:minmax(150px,.95fr) minmax(0,1.35fr) 42px;grid-template-areas:'country offer delete' 'url url delete' 'device weight delete';gap:8px;margin-bottom:8px;align-items:start}.rule input,.rule select{min-height:38px}.rule-country{grid-area:country}.rule-offer{grid-area:offer}.rule-url{grid-area:url}.rule-device{grid-area:device}.rule-weight{grid-area:weight}.rule-delete{grid-area:delete;width:42px;height:132px}.campaign-list,.offer-list{display:grid;gap:10px}.campaign{display:grid;grid-template-columns:minmax(180px,1fr) 120px 86px 86px auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,253,247,.84)}.campaign.selected{border-color:var(--black);box-shadow:inset 4px 0 0 var(--green)}.campaign-name,.offer-text{display:grid;gap:6px;min-width:0}.campaign-name strong,.campaign-name span,.offer-text strong,.offer-text span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}.muted{color:var(--muted)}.pill{width:max-content;max-width:100%;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:#fffdf7;font:600 11px/1 'IBM Plex Mono',monospace;text-transform:uppercase}.pill.on{color:var(--green-ink);border-color:rgba(13,125,97,.35);background:rgba(13,125,97,.11)}.pill.off{color:#7e211b;border-color:rgba(186,58,47,.28);background:rgba(186,58,47,.09)}.campaign-actions,.offer-actions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}.lower-grid{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(280px,.8fr) minmax(300px,1fr);gap:16px;margin-top:16px}.offer-form{display:grid;grid-template-columns:minmax(130px,.75fr) minmax(180px,1fr) auto;gap:8px;align-items:end}.offer-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,253,247,.84)}.simulate-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}.result-box{margin-top:12px;padding:12px;border:1px dashed var(--black);border-radius:8px;background:rgba(40,105,168,.07);overflow-wrap:anywhere}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat-table{width:100%;border-collapse:collapse;font-size:13px}.stat-table th,.stat-table td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}.stat-table th{color:var(--muted);font-size:11px;text-transform:uppercase}.toast{position:fixed;right:18px;bottom:18px;z-index:30;max-width:min(440px,calc(100vw - 36px));padding:12px 14px;border:1px solid var(--black);border-radius:8px;color:var(--panel);background:var(--black);box-shadow:5px 5px 0 rgba(32,29,25,.18);opacity:0;transform:translateY(10px);pointer-events:none;transition:180ms ease}.toast.show{opacity:1;transform:translateY(0)}.empty{padding:26px 14px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center}.modal-backdrop{position:fixed;inset:0;z-index:20;display:none;place-items:center;padding:18px;background:rgba(23,21,19,.46)}.modal-backdrop.open{display:grid}.modal{width:min(920px,calc(100vw - 24px));max-height:min(92vh,980px);overflow:auto;border:1px solid var(--black);border-radius:8px;background:var(--panel);box-shadow:8px 8px 0 rgba(32,29,25,.22)}@media(max-width:1080px){.topbar,.workspace,.lower-grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.shell{width:min(100vw - 16px,1480px);margin-top:8px}.brand,.panel-body,.panel-head{padding:12px}.brand{align-items:flex-start;flex-direction:column}.metrics,.form-grid,.switches,.stats,.simulate-grid,.offer-form{grid-template-columns:1fr}.campaign{grid-template-columns:1fr}.rule{grid-template-columns:1fr 42px;grid-template-areas:'country delete' 'offer offer' 'url url' 'device device' 'weight weight'}.rule-delete{height:40px}.campaign-actions{justify-content:flex-start}}
+    :root {
+      --ink: #171513;
+      --muted: #716b60;
+      --paper: #f6f0e4;
+      --panel: #fffaf0;
+      --panel-strong: #fff4d7;
+      --line: #ded1be;
+      --black: #201d19;
+      --green: #0d7d61;
+      --green-soft: rgba(13, 125, 97, 0.12);
+      --red: #ba3a2f;
+      --red-soft: rgba(186, 58, 47, 0.11);
+      --blue: #2869a8;
+      --blue-soft: rgba(40, 105, 168, 0.12);
+      --amber: #bd771d;
+      --amber-soft: rgba(189, 119, 29, 0.14);
+      --shadow: 0 24px 70px rgba(45, 38, 29, 0.12);
+      --hard-shadow: 5px 5px 0 rgba(32, 29, 25, 0.15);
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Archivo", "IBM Plex Sans", sans-serif;
+      background:
+        linear-gradient(90deg, rgba(32, 29, 25, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+        linear-gradient(0deg, rgba(32, 29, 25, 0.03) 1px, transparent 1px) 0 0 / 24px 24px,
+        radial-gradient(circle at 14% 7%, rgba(13, 125, 97, 0.16), transparent 28%),
+        radial-gradient(circle at 92% 8%, rgba(189, 119, 29, 0.16), transparent 30%),
+        linear-gradient(135deg, rgba(255, 250, 240, 0.78), rgba(247, 238, 221, 0.82)),
+        var(--paper);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    button {
+      min-height: 38px;
+      border: 1px solid var(--black);
+      border-radius: 8px;
+      padding: 0 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--panel);
+      background: var(--black);
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: var(--hard-shadow);
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+      white-space: nowrap;
+    }
+
+    button:hover { transform: translate(-1px, -1px); box-shadow: 7px 7px 0 rgba(32, 29, 25, 0.14); }
+    button:disabled { opacity: 0.55; pointer-events: none; }
+    button.icon { width: 38px; padding: 0; }
+    button.secondary { color: var(--ink); background: #fffdf7; }
+    button.success { background: var(--green); border-color: #075643; }
+    button.danger { background: var(--red); border-color: #81231d; }
+    button.flat { color: var(--ink); background: transparent; border-color: var(--line); box-shadow: none; }
+    button.ghost { color: var(--ink); background: var(--panel); box-shadow: none; }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      color: var(--ink);
+      background: #fffdf7;
+      outline: none;
+    }
+
+    textarea { min-height: 96px; resize: vertical; line-height: 1.35; }
+    input:focus, select:focus, textarea:focus { border-color: var(--black); box-shadow: 0 0 0 3px rgba(13, 125, 97, 0.13); }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    a { color: var(--blue); }
+
+    .app-shell {
+      width: min(1540px, calc(100vw - 24px));
+      margin: 14px auto 32px;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 14px;
+      min-height: calc(100vh - 28px);
+      border: 1px solid var(--black);
+      border-radius: var(--radius);
+      background: rgba(255, 250, 240, 0.94);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .brand {
+      padding: 18px;
+      border-bottom: 1px solid var(--black);
+      background:
+        radial-gradient(circle at 88% 16%, rgba(13, 125, 97, 0.18), transparent 42%),
+        linear-gradient(145deg, rgba(255, 244, 215, 0.95), rgba(255, 250, 240, 0.95));
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--black);
+      border-radius: 10px;
+      color: var(--panel);
+      background: var(--black);
+      box-shadow: var(--hard-shadow);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 0.88;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+
+    .brand p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .nav {
+      display: grid;
+      gap: 7px;
+      padding: 12px;
+    }
+
+    .nav button {
+      min-height: 46px;
+      justify-content: flex-start;
+      color: var(--ink);
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .nav button.active {
+      border-color: var(--black);
+      background: var(--panel-strong);
+      box-shadow: 3px 3px 0 rgba(32, 29, 25, 0.12);
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 10px;
+    }
+
+    .content { min-width: 0; }
+
+    .topbar {
+      min-height: 112px;
+      margin-bottom: 16px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid var(--black);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(100deg, rgba(32, 29, 25, 0.05), transparent 38%),
+        rgba(255, 250, 240, 0.93);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font: 700 11px/1 "IBM Plex Mono", monospace;
+      color: var(--green);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 54px);
+      line-height: 0.92;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+    }
+
+    .topbar p {
+      margin: 10px 0 0;
+      max-width: 840px;
+      color: var(--muted);
+      line-height: 1.42;
+    }
+
+    .top-actions { display: flex; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .tab-panel { display: none; animation: rise 220ms ease both; }
+    .tab-panel.active { display: block; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid.kpi { grid-template-columns: repeat(7, minmax(128px, 1fr)); }
+
+    .panel, .stat-card, .metric-card {
+      border: 1px solid var(--black);
+      border-radius: var(--radius);
+      background: rgba(255, 250, 240, 0.94);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      min-height: 58px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(32, 29, 25, 0.04);
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+    }
+
+    .panel-body { padding: 16px; }
+
+    .stat-card {
+      min-height: 118px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      right: -26px;
+      top: -42px;
+      width: 108px;
+      height: 108px;
+      border: 1px solid rgba(32, 29, 25, 0.12);
+      border-radius: 999px;
+      background: var(--amber-soft);
+    }
+
+    .stat-card.green::after { background: var(--green-soft); }
+    .stat-card.blue::after { background: var(--blue-soft); }
+    .stat-card.red::after { background: var(--red-soft); }
+
+    .stat-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .stat-card strong {
+      display: block;
+      margin-top: 12px;
+      font: 700 32px/1 "IBM Plex Mono", monospace;
+      letter-spacing: -0.05em;
+    }
+
+    .stat-card small { display: block; margin-top: 8px; color: var(--muted); }
+
+    .toolbar {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .toolbar input, .toolbar select { max-width: 320px; }
+
+    .table-wrap { width: 100%; overflow: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      background: rgba(255, 253, 247, 0.62);
+    }
+
+    tr:hover td { background: rgba(32, 29, 25, 0.025); }
+
+    .mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+    .muted { color: var(--muted); }
+    .nowrap { white-space: nowrap; }
+    .truncate { max-width: 330px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .right { text-align: right; }
+    .wide { grid-column: 1 / -1; }
+
+    .pill {
+      width: max-content;
+      max-width: 100%;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fffdf7;
+      font: 700 11px/1 "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .pill.on { color: #075643; border-color: rgba(13, 125, 97, 0.35); background: var(--green-soft); }
+    .pill.off { color: #81231d; border-color: rgba(186, 58, 47, 0.28); background: var(--red-soft); }
+    .pill.info { color: #174b7c; border-color: rgba(40, 105, 168, 0.26); background: var(--blue-soft); }
+
+    .row-actions { display: flex; justify-content: flex-end; gap: 7px; flex-wrap: wrap; }
+
+    .empty, .api-state {
+      padding: 26px 16px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      color: var(--muted);
+      background: rgba(255, 253, 247, 0.62);
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .api-state.error { color: #81231d; border-color: rgba(186, 58, 47, 0.35); background: var(--red-soft); }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .switch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+    .switch {
+      min-height: 44px;
+      padding: 9px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+      color: var(--ink);
+      text-transform: none;
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+
+    .switch input { width: 19px; min-height: 19px; accent-color: var(--green); }
+
+    .rules-header {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .rules-list { display: grid; gap: 9px; margin-top: 10px; }
+
+    .rule {
+      display: grid;
+      grid-template-columns: minmax(160px, 0.85fr) minmax(160px, 1fr) minmax(160px, 1.25fr) minmax(116px, 0.7fr) minmax(92px, 0.45fr) 42px;
+      gap: 8px;
+      align-items: end;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 253, 247, 0.74);
+    }
+
+    .rule button { min-height: 40px; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(23, 21, 19, 0.48);
+    }
+
+    .modal-backdrop.open { display: grid; }
+
+    .modal {
+      width: min(1080px, calc(100vw - 24px));
+      max-height: min(92vh, 980px);
+      overflow: auto;
+      border: 1px solid var(--black);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 9px 9px 0 rgba(32, 29, 25, 0.22);
+    }
+
+    .modal.small { width: min(760px, calc(100vw - 24px)); }
+
+    .modal-actions {
+      padding-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      max-width: min(460px, calc(100vw - 36px));
+      padding: 12px 14px;
+      border: 1px solid var(--black);
+      border-radius: 10px;
+      color: var(--panel);
+      background: var(--black);
+      box-shadow: var(--hard-shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: 180ms ease;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .url-box {
+      padding: 12px;
+      border: 1px dashed var(--black);
+      border-radius: 10px;
+      background: var(--blue-soft);
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+
+    .copyable {
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+    }
+
+    .hint-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .mini-stack { display: grid; gap: 8px; }
+
+    @media (max-width: 1180px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; min-height: auto; }
+      .nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .brand { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+      .brand-mark { margin: 0; }
+      .sidebar-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.kpi { grid-template-columns: repeat(4, minmax(128px, 1fr)); }
+    }
+
+    @media (max-width: 860px) {
+      .app-shell { width: min(100vw - 14px, 1540px); margin-top: 8px; }
+      .topbar { grid-template-columns: 1fr; }
+      .top-actions { justify-content: flex-start; }
+      .grid.two, .grid.three, .grid.four, .grid.kpi, .form-grid, .form-grid.three, .switch-grid { grid-template-columns: 1fr; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .rule { grid-template-columns: 1fr; }
+      .row-actions { justify-content: flex-start; }
+      .sidebar-footer { grid-template-columns: 1fr; }
+      .panel-body, .panel-head, .topbar, .brand { padding: 12px; }
+      table { min-width: 680px; }
+    }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <section class="topbar">
-      <div class="brand"><div><h1>Geo TDS<br>Tracker</h1><p>Мультиссылки с GEO/device правилами, fallback-потоком, статистикой и быстрой проверкой маршрута.</p></div><button class="secondary" id="refreshBtn" title="Обновить"><i data-lucide="refresh-cw"></i>Обновить</button></div>
-      <div class="metrics"><div class="metric"><span>Кампании</span><strong id="metricCampaigns">0</strong></div><div class="metric"><span>Переходы</span><strong id="metricClicks">0</strong></div><div class="metric"><span>24 часа</span><strong id="metric24h">0</strong></div></div>
-    </section>
-    <section class="workspace">
-      <div class="panel"><div class="panel-head"><h2 id="formTitle">Новая мультиссылка</h2><button class="flat" id="resetBtn"><i data-lucide="file-plus-2"></i>Новая</button></div><div class="panel-body"><div class="form-grid"><label>Название<input id="name" type="text" placeholder="TikTok KZ/US campaign"></label><label>Slug<input id="slug" type="text" placeholder="geo-main"></label><label class="wide">Default URL<input id="default_url" type="url" placeholder="https://example.com/fallback"></label><label>Лимит кликов<input id="click_limit" type="number" min="1" placeholder="Без лимита"></label></div><div class="switches"><label class="switch"><span>Активна</span><input id="is_active" type="checkbox" checked></label><label class="switch"><span>Блокировать ботов</span><input id="block_bots" type="checkbox" checked></label></div><div class="links-toolbar"><h3 class="section-title">GEO правила</h3><button class="secondary" id="addRuleBtn"><i data-lucide="plus"></i>Правило</button></div><div id="links"></div><div class="actions"><button class="secondary" id="copyCurrentBtn"><i data-lucide="copy"></i>Скопировать Go URL</button><button class="success" id="saveBtn"><i data-lucide="save"></i>Создать</button></div></div></div>
-      <div class="panel"><div class="panel-head"><h2>Кампании</h2><span class="pill" id="selectedLabel">Ничего не выбрано</span></div><div class="panel-body"><div class="list-toolbar"><input id="search" type="search" placeholder="Поиск по названию или slug"><button class="secondary" id="reloadBtn"><i data-lucide="rotate-cw"></i>Reload</button></div><div id="campaigns" class="campaign-list"></div></div></div>
-    </section>
-    <section class="lower-grid">
-      <div class="panel"><div class="panel-head"><h2>Офферы</h2><button class="flat" id="resetOfferBtn"><i data-lucide="file-plus-2"></i>Новый</button></div><div class="panel-body"><div class="offer-form"><label>Название<input id="offerName" type="text" placeholder="Leadgen KZ"></label><label>URL<input id="offerUrl" type="url" placeholder="https://offer.example"></label><button id="saveOfferBtn"><i data-lucide="save"></i>Сохранить</button></div><div id="offers" class="offer-list"></div></div></div>
-      <div class="panel"><div class="panel-head"><h2>Проверка редиректа</h2><span class="pill">без записи клика</span></div><div class="panel-body"><div class="simulate-grid"><label>Country<input id="simCountry" maxlength="3" placeholder="US или ANY" value="US"></label><label>Device<select id="simDevice"><option value="desktop">desktop</option><option value="mobile">mobile</option><option value="tablet">tablet</option></select></label><button id="simulateBtn"><i data-lucide="route"></i>Тест</button></div><div id="simulateResult" class="result-box muted">Выбери кампанию и проверь итоговый URL.</div></div></div>
-      <div class="panel"><div class="panel-head"><h2>Статистика</h2><button class="flat" id="statsBtn"><i data-lucide="bar-chart-3"></i>Обновить</button></div><div class="panel-body"><div id="stats" class="empty">Выбери кампанию, чтобы увидеть клики по GEO и устройствам.</div></div></div>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><i data-lucide="radar"></i></div>
+        <div>
+          <h1>Geo TDS<br>Tracker</h1>
+          <p>Кампании, офферы, источники, отчеты и проверка маршрутизации в одном рабочем интерфейсе.</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Основная навигация">
+        <button class="active" data-tab="dashboard"><i data-lucide="layout-dashboard"></i>Dashboard</button>
+        <button data-tab="campaigns"><i data-lucide="route"></i>Campaigns</button>
+        <button data-tab="offers"><i data-lucide="badge-dollar-sign"></i>Offers</button>
+        <button data-tab="sources"><i data-lucide="satellite-dish"></i>Sources</button>
+        <button data-tab="reports"><i data-lucide="bar-chart-3"></i>Logs / Reports</button>
+        <button data-tab="tools"><i data-lucide="wrench"></i>Tools</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="secondary" id="globalRefreshBtn"><i data-lucide="refresh-cw"></i>Обновить все</button>
+        <span class="pill info" id="apiHealth">API ready</span>
+      </div>
+    </aside>
+
+    <section class="content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="pageEyebrow">Control room</p>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageDescription">Быстрый обзор трафика, конверсий и состояния кампаний. Если новые backend endpoints еще не готовы, блоки покажут fallback вместо падения интерфейса.</p>
+        </div>
+        <div class="top-actions" id="pageActions"></div>
+      </header>
+
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="grid kpi" id="dashboardKpis"></div>
+        <div class="grid two" style="margin-top:16px;">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Последние кампании</h3>
+              <button class="flat" data-tab-jump="campaigns"><i data-lucide="arrow-right"></i>К списку</button>
+            </div>
+            <div class="panel-body" id="dashboardCampaigns"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Performance breakdown</h3>
+              <div class="toolbar-right">
+                <select id="dashboardGroup">
+                  <option value="campaign">Campaign</option>
+                  <option value="country">Country</option>
+                  <option value="offer">Offer</option>
+                  <option value="source">Source</option>
+                  <option value="device">Device</option>
+                </select>
+              </div>
+            </div>
+            <div class="panel-body" id="dashboardBreakdown"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-campaigns" class="tab-panel">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Кампании</h3>
+            <button class="success" id="newCampaignBtn"><i data-lucide="plus"></i>Новая кампания</button>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <input id="campaignSearch" type="search" placeholder="Поиск по названию или slug">
+                <select id="campaignStatusFilter">
+                  <option value="all">Все статусы</option>
+                  <option value="active">Активные</option>
+                  <option value="paused">Выключенные</option>
+                </select>
+              </div>
+              <div class="toolbar-right">
+                <button class="secondary" id="reloadCampaignsBtn"><i data-lucide="rotate-cw"></i>Reload</button>
+              </div>
+            </div>
+            <div class="table-wrap" id="campaignsTable"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-offers" class="tab-panel">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Офферы</h3>
+            <button class="success" id="newOfferBtn"><i data-lucide="plus"></i>Новый оффер</button>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <input id="offerSearch" type="search" placeholder="Поиск по офферу, сети, стране">
+                <select id="offerStatusFilter">
+                  <option value="all">Все</option>
+                  <option value="active">Активные</option>
+                  <option value="paused">Выключенные</option>
+                </select>
+              </div>
+              <button class="secondary" id="reloadOffersBtn"><i data-lucide="rotate-cw"></i>Reload</button>
+            </div>
+            <div class="table-wrap" id="offersTable"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-sources" class="tab-panel">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Источники трафика</h3>
+            <button class="success" id="newSourceBtn"><i data-lucide="plus"></i>Новый источник</button>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <input id="sourceSearch" type="search" placeholder="Поиск по названию источника">
+              </div>
+              <button class="secondary" id="reloadSourcesBtn"><i data-lucide="rotate-cw"></i>Reload</button>
+            </div>
+            <div class="table-wrap" id="sourcesTable"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-reports" class="tab-panel">
+        <div class="grid kpi" id="reportKpis"></div>
+        <div class="panel" style="margin-top:16px;">
+          <div class="panel-head">
+            <h3>Breakdown</h3>
+            <div class="toolbar-right">
+              <select id="reportGroup">
+                <option value="campaign">Campaign</option>
+                <option value="country">Country</option>
+                <option value="offer">Offer</option>
+                <option value="source">Source</option>
+                <option value="device">Device</option>
+                <option value="sub_id_1">Sub ID 1</option>
+              </select>
+              <button class="secondary" id="reloadReportsBtn"><i data-lucide="rotate-cw"></i>Обновить</button>
+            </div>
+          </div>
+          <div class="panel-body" id="reportBreakdown"></div>
+        </div>
+        <div class="grid two" style="margin-top:16px;">
+          <div class="panel">
+            <div class="panel-head"><h3>Recent clicks</h3><span class="pill">click_id copy</span></div>
+            <div class="panel-body" id="clicksLog"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Recent conversions</h3><span class="pill">postback log</span></div>
+            <div class="panel-body" id="conversionsLog"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-tools" class="tab-panel">
+        <div class="grid two">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Проверка редиректа</h3>
+              <span class="pill">без записи клика</span>
+            </div>
+            <div class="panel-body mini-stack">
+              <label>Кампания
+                <select id="simCampaign"></select>
+              </label>
+              <div class="form-grid three">
+                <label>Country<select id="simCountry"></select></label>
+                <label>Device
+                  <select id="simDevice">
+                    <option value="desktop">Desktop</option>
+                    <option value="mobile">Mobile</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="all">All</option>
+                  </select>
+                </label>
+                <label>Source label<input id="simSource" placeholder="facebook / test" value="test"></label>
+              </div>
+              <button id="simulateBtn"><i data-lucide="route"></i>Проверить маршрут</button>
+              <div id="simulateResult" class="url-box muted">Выбери кампанию, страну и устройство.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Генератор ссылки</h3><span class="pill info">macros ready</span></div>
+            <div class="panel-body mini-stack">
+              <label>Кампания<select id="builderCampaign"></select></label>
+              <div class="form-grid">
+                <label>Source<input id="builderSource" placeholder="facebook"></label>
+                <label>Cost<input id="builderCost" placeholder="{cost} или 0.12"></label>
+                <label>Sub ID 1<input id="builderSub1" placeholder="{campaign_id}"></label>
+                <label>Sub ID 2<input id="builderSub2" placeholder="{creative_id}"></label>
+              </div>
+              <button class="secondary" id="buildUrlBtn"><i data-lucide="link"></i>Собрать URL</button>
+              <div id="builtUrl" class="url-box muted">URL появится здесь.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+          <div class="panel-head"><h3>Макросы и postback</h3><span class="pill">операторская шпаргалка</span></div>
+          <div class="panel-body">
+            <div class="grid two">
+              <div>
+                <p class="eyebrow">Offer URL macros</p>
+                <ul class="hint-list">
+                  <li><span class="mono">{click_id}</span> - ID клика для postback.</li>
+                  <li><span class="mono">{country}</span>, <span class="mono">{device}</span>, <span class="mono">{campaign}</span> - параметры маршрутизации.</li>
+                  <li><span class="mono">{source}</span>, <span class="mono">{sub_id_1}</span>... - параметры источника трафика.</li>
+                </ul>
+              </div>
+              <div>
+                <p class="eyebrow">Postback example</p>
+                <div class="url-box mono" id="postbackExample"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
-  <div id="editModal" class="modal-backdrop" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true"><div class="panel-head"><h2 id="editTitle">Редактирование кампании</h2><button class="flat" id="closeEditBtn"><i data-lucide="x"></i>Закрыть</button></div><div class="panel-body"><div class="form-grid"><label>Название<input id="edit_name" type="text"></label><label>Slug<input id="edit_slug" type="text"></label><label class="wide">Default URL<input id="edit_default_url" type="url"></label><label>Лимит кликов<input id="edit_click_limit" type="number" min="1" placeholder="Без лимита"></label></div><div class="switches"><label class="switch"><span>Активна</span><input id="edit_is_active" type="checkbox"></label><label class="switch"><span>Блокировать ботов</span><input id="edit_block_bots" type="checkbox"></label></div><div class="links-toolbar"><h3 class="section-title">GEO правила</h3><button class="secondary" id="editAddRuleBtn"><i data-lucide="plus"></i>Правило</button></div><div id="editLinks"></div><div class="actions"><button class="secondary" id="cancelEditBtn"><i data-lucide="x"></i>Отмена</button><button class="success" id="saveEditBtn"><i data-lucide="save"></i>Сохранить</button></div></div></div></div>
+
+  <div id="campaignModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="campaignModalTitle">
+      <div class="panel-head">
+        <h3 id="campaignModalTitle">Кампания</h3>
+        <button class="flat" data-close-modal="campaignModal"><i data-lucide="x"></i>Закрыть</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <label>Название<input id="campaignName" type="text" placeholder="TikTok KZ / US"></label>
+          <label>Slug<input id="campaignSlug" type="text" placeholder="geo-main"></label>
+          <label class="wide">Default URL<input id="campaignDefaultUrl" type="url" placeholder="https://example.com/fallback"></label>
+          <label>Лимит кликов<input id="campaignClickLimit" type="number" min="1" placeholder="Без лимита"></label>
+        </div>
+        <div class="switch-grid" style="margin-top:12px;">
+          <label class="switch"><span>Активна</span><input id="campaignActive" type="checkbox" checked></label>
+          <label class="switch"><span>Блокировать ботов</span><input id="campaignBlockBots" type="checkbox" checked></label>
+        </div>
+        <div class="rules-header">
+          <h3 class="eyebrow">GEO правила</h3>
+          <button class="secondary" id="addRuleBtn"><i data-lucide="plus"></i>Правило</button>
+        </div>
+        <div class="rules-list" id="campaignRules"></div>
+        <div class="modal-actions">
+          <button class="secondary" id="copyCampaignUrlBtn"><i data-lucide="copy"></i>Скопировать Go URL</button>
+          <button class="flat" data-close-modal="campaignModal"><i data-lucide="x"></i>Отмена</button>
+          <button class="success" id="saveCampaignBtn"><i data-lucide="save"></i>Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="offerModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="offerModalTitle">
+      <div class="panel-head">
+        <h3 id="offerModalTitle">Оффер</h3>
+        <button class="flat" data-close-modal="offerModal"><i data-lucide="x"></i>Закрыть</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <label>Название<input id="offerName" type="text" placeholder="Leadgen KZ"></label>
+          <label>Affiliate network<input id="offerNetwork" type="text" placeholder="Leadbit / Custom"></label>
+          <label class="wide">URL<input id="offerUrl" type="url" placeholder="https://offer.example/path?subid={click_id}"></label>
+          <label>Payout type
+            <select id="offerPayoutType">
+              <option value="CPA">CPA</option>
+              <option value="CPL">CPL</option>
+              <option value="CPC">CPC</option>
+              <option value="RevShare">RevShare</option>
+            </select>
+          </label>
+          <label>Payout<input id="offerPayout" type="number" min="0" step="0.01" placeholder="10.00"></label>
+          <label>Conversion cap<input id="offerCap" type="number" min="0" placeholder="Без cap"></label>
+          <label>Страны<select id="offerCountries" multiple size="7"></select></label>
+          <label class="wide">Заметки<textarea id="offerNotes" placeholder="Условия, ограничения, комментарии"></textarea></label>
+        </div>
+        <div class="switch-grid" style="margin-top:12px;">
+          <label class="switch"><span>Активен</span><input id="offerActive" type="checkbox" checked></label>
+        </div>
+        <div class="modal-actions">
+          <button class="flat" data-close-modal="offerModal"><i data-lucide="x"></i>Отмена</button>
+          <button class="success" id="saveOfferBtn"><i data-lucide="save"></i>Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sourceModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
+      <div class="panel-head">
+        <h3 id="sourceModalTitle">Источник трафика</h3>
+        <button class="flat" data-close-modal="sourceModal"><i data-lucide="x"></i>Закрыть</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <label>Название<input id="sourceName" type="text" placeholder="Facebook Ads"></label>
+          <label>External ID param<input id="sourceExternalId" type="text" placeholder="fbclid / click_id"></label>
+          <label class="wide">Postback URL<textarea id="sourcePostbackUrl" placeholder="https://network.example/postback?click_id={click_id}&payout={payout}"></textarea></label>
+          <label class="wide">Param mappings JSON<textarea id="sourceMappings" class="mono" placeholder='{"campaign_id":"utm_campaign","creative_id":"utm_content","cost":"cost","sub_id_1":"adset"}'></textarea></label>
+        </div>
+        <div class="modal-actions">
+          <button class="flat" data-close-modal="sourceModal"><i data-lucide="x"></i>Отмена</button>
+          <button class="success" id="saveSourceBtn"><i data-lucide="save"></i>Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
+
   <script>
-    const state={campaigns:[],offers:[],selectedId:null,editingId:null,editingOfferId:null};
-    const $=(id)=>document.getElementById(id);
-    const icon=(name,extra='')=>`<i data-lucide="${name}" ${extra}></i>`;
-    const refreshIcons=()=>window.lucide&&window.lucide.createIcons();
-    const escapeHtml=(v)=>String(v??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-    async function api(path,options={}){const r=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`HTTP ${r.status}`);return data}
-    function toast(message,ok=true){const n=$('toast');n.textContent=message;n.style.background=ok?'var(--black)':'var(--red)';n.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>n.classList.remove('show'),3200)}
-    const publicUrl=(slug)=>`${location.origin}/go/${slug}`;
-    const countryNames=typeof Intl!=='undefined'&&Intl.DisplayNames?new Intl.DisplayNames(['ru'],{type:'region'}):null;
-    const fallbackCountries=['KZ','RU','US','DE','FR','GB','ES','IT','TR','UA','BY','UZ','KG','AM','GE','AE','IN','ID','TH','VN','BR','MX','CA','AU'];
-    const COUNTRY_CODES=['*',...(Intl.supportedValuesOf?Intl.supportedValuesOf('region').filter((c)=>/^[A-Z]{2}$/.test(c)):fallbackCountries)].filter((v,i,a)=>a.indexOf(v)===i);
-    const normalizeCountryValue=(v)=>{const c=String(v||'').trim().toUpperCase();return !c||c==='*'||c==='ANY'||c==='ALL'?'*':c};
-    const countryLabel=(c)=>c==='*'?'ANY - Любая страна':`${c} - ${countryNames?.of(c)||c}`;
-    const countryOptions=(selectedValue)=>{const selected=normalizeCountryValue(selectedValue);return COUNTRY_CODES.map((c)=>`<option value="${c}" ${c===selected?'selected':''}>${escapeHtml(countryLabel(c))}</option>`).join('')};
-    const findOfferByUrl=(url)=>state.offers.find((o)=>o.url===url);
-    function offerOptions(selectedUrl=''){const found=findOfferByUrl(selectedUrl);return `<option value="custom" ${found?'':'selected'}>Своя ссылка</option>`+state.offers.map((o)=>`<option value="${o.id}" data-url="${escapeHtml(o.url)}" ${found?.id===o.id?'selected':''}>${escapeHtml(o.name)}</option>`).join('')}
-    function applyOfferToRule(select){const option=select.selectedOptions[0];const row=select.closest('.rule');if(row&&option?.dataset.url)row.querySelector('.rule-url').value=option.dataset.url}
-    function addRule(link={},targetId='links'){const row=document.createElement('div');row.className='rule';row.innerHTML=`<select class="rule-country">${countryOptions(link.country_code)}</select><select class="rule-offer">${offerOptions(link.url)}</select><input class="rule-url" type="url" placeholder="https://offer.example/path" value="${escapeHtml(link.url||'')}"><select class="rule-device">${['all','desktop','mobile','tablet'].map((d)=>`<option value="${d}" ${d===(link.device_type||'all')?'selected':''}>${d}</option>`).join('')}</select><input class="rule-weight" type="number" min="1" value="${escapeHtml(link.weight||100)}"><button type="button" class="icon danger rule-delete" title="Удалить правило">${icon('trash-2')}</button>`;row.querySelector('.rule-offer').addEventListener('change',(e)=>applyOfferToRule(e.currentTarget));row.querySelector('button').addEventListener('click',()=>row.remove());$(targetId).appendChild(row);refreshIcons()}
-    function collectLinks(targetId='links'){return [...document.querySelectorAll(`#${targetId} .rule`)].map((row)=>({country_code:normalizeCountryValue(row.querySelector('.rule-country').value),url:row.querySelector('.rule-url').value.trim(),device_type:row.querySelector('.rule-device').value,weight:Number(row.querySelector('.rule-weight').value||100)})).filter((l)=>l.url)}
-    function refreshRuleOfferChoices(){document.querySelectorAll('.rule').forEach((row)=>{row.querySelector('.rule-offer').innerHTML=offerOptions(row.querySelector('.rule-url').value.trim())})}
-    const basePayload=(prefix='')=>({name:$(`${prefix}name`).value.trim(),slug:$(`${prefix}slug`).value.trim(),default_url:$(`${prefix}default_url`).value.trim(),click_limit:$(`${prefix}click_limit`).value?Number($(`${prefix}click_limit`).value):null,start_date:null,end_date:null,is_active:$(`${prefix}is_active`).checked,block_bots:$(`${prefix}block_bots`).checked,links:collectLinks(prefix?'editLinks':'links')});
-    function resetForm(){$('name').value='';$('slug').value='';$('default_url').value='';$('click_limit').value='';$('is_active').checked=true;$('block_bots').checked=true;$('links').innerHTML='';addRule({country_code:'ANY',device_type:'all',weight:100});renderCampaigns()}
-    async function saveCampaign(){try{const data=await api('/api/admin/tds/campaigns',{method:'POST',body:JSON.stringify(basePayload())});state.selectedId=data.campaign.id;toast('Кампания создана');resetForm();await loadCampaigns(false);await loadStats()}catch(e){toast(e.message,false)}}
-    function openEditModal(){$('editModal').classList.add('open');$('editModal').setAttribute('aria-hidden','false');refreshIcons()}
-    function closeEditModal(){$('editModal').classList.remove('open');$('editModal').setAttribute('aria-hidden','true');state.editingId=null}
-    async function editCampaign(id){try{const data=await api(`/api/admin/tds/campaigns/${id}`);state.selectedId=id;state.editingId=id;$('editTitle').textContent=`Редактирование #${id}`;$('edit_name').value=data.campaign.name||'';$('edit_slug').value=data.campaign.slug||'';$('edit_default_url').value=data.campaign.default_url||'';$('edit_click_limit').value=data.campaign.click_limit||'';$('edit_is_active').checked=Boolean(data.campaign.is_active);$('edit_block_bots').checked=Boolean(data.campaign.block_bots);$('editLinks').innerHTML='';(data.links.length?data.links:[{country_code:'ANY',device_type:'all',weight:100}]).forEach((l)=>addRule(l,'editLinks'));$('selectedLabel').textContent=data.campaign.slug;renderCampaigns();openEditModal();await loadStats()}catch(e){toast(e.message,false)}}
-    async function saveEditCampaign(){if(!state.editingId)return;try{const data=await api(`/api/admin/tds/campaigns/${state.editingId}`,{method:'PUT',body:JSON.stringify(basePayload('edit_'))});state.selectedId=data.campaign.id;toast('Кампания обновлена');closeEditModal();await loadCampaigns(false);await loadStats()}catch(e){toast(e.message,false)}}
-    async function copyText(text,label='Скопировано'){try{await navigator.clipboard.writeText(text);toast(label)}catch{toast('Clipboard недоступен в браузере',false)}}
-    async function deleteCampaign(id){if(!confirm(`Удалить кампанию #${id}?`))return;try{await api(`/api/admin/tds/campaigns/${id}`,{method:'DELETE'});if(state.selectedId===id){state.selectedId=null;resetForm();$('stats').className='empty';$('stats').textContent='Выбери кампанию, чтобы увидеть клики по GEO и устройствам.'}toast('Кампания удалена');await loadCampaigns(false)}catch(e){toast(e.message,false)}}
-    async function duplicateCampaign(id){try{const data=await api(`/api/admin/tds/campaigns/${id}/duplicate`,{method:'POST',body:'{}'});toast('Копия создана и оставлена выключенной');await loadCampaigns(false);await editCampaign(data.campaign.id)}catch(e){toast(e.message,false)}}
-    async function toggleCampaign(id,value){try{await api(`/api/admin/tds/campaigns/${id}/status`,{method:'PATCH',body:JSON.stringify({is_active:value})});await loadCampaigns(false)}catch(e){toast(e.message,false)}}
-    function resetOfferForm(){state.editingOfferId=null;$('offerName').value='';$('offerUrl').value='';$('saveOfferBtn').innerHTML=`${icon('save')}Сохранить`;refreshIcons()}
-    async function saveOffer(){try{const payload={name:$('offerName').value.trim(),url:$('offerUrl').value.trim()};await api(state.editingOfferId?`/api/admin/tds/offers/${state.editingOfferId}`:'/api/admin/tds/offers',{method:state.editingOfferId?'PUT':'POST',body:JSON.stringify(payload)});toast(state.editingOfferId?'Оффер обновлен':'Оффер сохранен');resetOfferForm();await loadOffers()}catch(e){toast(e.message,false)}}
-    function editOffer(id){const offer=state.offers.find((o)=>Number(o.id)===Number(id));if(!offer)return;state.editingOfferId=offer.id;$('offerName').value=offer.name;$('offerUrl').value=offer.url;$('saveOfferBtn').innerHTML=`${icon('save')}Обновить`;refreshIcons()}
-    async function deleteOffer(id){if(!confirm(`Удалить оффер #${id}?`))return;try{await api(`/api/admin/tds/offers/${id}`,{method:'DELETE'});toast('Оффер удален');if(Number(state.editingOfferId)===Number(id))resetOfferForm();await loadOffers()}catch(e){toast(e.message,false)}}
-    function renderOffers(){const node=$('offers');if(!state.offers.length){node.innerHTML='<div class="empty">Сохраненных офферов пока нет.</div>';return}node.innerHTML=state.offers.map((o)=>`<article class="offer-item"><div class="offer-text"><strong>${escapeHtml(o.name)}</strong><span class="mono muted">${escapeHtml(o.url)}</span></div><div class="offer-actions"><button class="icon secondary" data-offer-action="edit" data-id="${o.id}">${icon('square-pen')}</button><button class="icon danger" data-offer-action="delete" data-id="${o.id}">${icon('trash-2')}</button></div></article>`).join('');refreshIcons()}
-    async function loadOffers(){try{const data=await api('/api/admin/tds/offers');state.offers=data.offers||[];renderOffers();refreshRuleOfferChoices()}catch(e){toast(e.message,false)}}
-    function updateMetrics(){const clicks=state.campaigns.reduce((s,c)=>s+Number(c.click_count||0),0);const clicks24=state.campaigns.reduce((s,c)=>s+Number(c.clicks_24h||0),0);$('metricCampaigns').textContent=state.campaigns.length;$('metricClicks').textContent=clicks;$('metric24h').textContent=clicks24}
-    function renderCampaigns(){const q=$('search').value.trim().toLowerCase();const list=state.campaigns.filter((c)=>!q||c.name.toLowerCase().includes(q)||c.slug.toLowerCase().includes(q));const node=$('campaigns');if(!list.length){node.innerHTML='<div class="empty">Кампаний нет или поиск ничего не нашел.</div>';return}node.innerHTML=list.map((c)=>{const url=publicUrl(c.slug);return `<article class="campaign ${Number(c.id)===Number(state.selectedId)?'selected':''}"><div class="campaign-name"><strong>${escapeHtml(c.name)}</strong><span class="mono muted">${escapeHtml(c.slug)}</span></div><span class="pill ${c.is_active?'on':'off'}">${c.is_active?'active':'paused'}</span><span class="mono">${Number(c.link_count||0)} rules</span><span class="mono">${Number(c.click_count||0)} clicks</span><div class="campaign-actions"><button class="icon secondary" data-action="edit" data-id="${c.id}">${icon('square-pen')}</button><button class="icon secondary" data-action="copy" data-url="${escapeHtml(url)}">${icon('copy')}</button><button class="icon secondary" data-action="open" data-url="${escapeHtml(url)}">${icon('external-link')}</button><button class="icon secondary" data-action="duplicate" data-id="${c.id}">${icon('copy-plus')}</button><button class="icon ${c.is_active?'secondary':'success'}" data-action="toggle" data-id="${c.id}" data-value="${c.is_active?'false':'true'}">${icon(c.is_active?'pause':'play')}</button><button class="icon danger" data-action="delete" data-id="${c.id}">${icon('trash-2')}</button></div></article>`}).join('');refreshIcons()}
-    async function loadCampaigns(showToast=true){$('reloadBtn').disabled=true;try{const data=await api('/api/admin/tds/campaigns');state.campaigns=data.campaigns||[];updateMetrics();renderCampaigns();if(showToast)toast('Данные обновлены')}catch(e){toast(e.message,false)}finally{$('reloadBtn').disabled=false}}
-    async function simulate(){if(!state.selectedId)return toast('Сначала выбери кампанию',false);try{const country=encodeURIComponent($('simCountry').value.trim()||'ANY');const device=encodeURIComponent($('simDevice').value);const data=await api(`/api/admin/tds/campaigns/${state.selectedId}/simulate?country=${country}&device=${device}`);const r=data.result;$('simulateResult').className='result-box';$('simulateResult').innerHTML=`<div class="mono">${escapeHtml(r.country_code)} / ${escapeHtml(r.device_type)}</div><strong>${r.used_default?'Default URL':'Matched rule'}</strong><div><a href="${escapeHtml(r.redirect_url)}" target="_blank" rel="noreferrer">${escapeHtml(r.redirect_url)}</a></div>`}catch(e){toast(e.message,false)}}
-    async function loadStats(){if(!state.selectedId)return toast('Сначала выбери кампанию',false);try{const {stats}=await api(`/api/admin/tds/campaigns/${state.selectedId}/stats`);$('stats').className='stats';$('stats').innerHTML=`<div><div class="metric" style="min-height:74px;box-shadow:none"><span>Total</span><strong>${stats.total}</strong></div><table class="stat-table"><thead><tr><th>Country</th><th>Clicks</th></tr></thead><tbody>${(stats.byCountry||[]).map((r)=>`<tr><td>${escapeHtml(r.country_code)}</td><td>${r.clicks}</td></tr>`).join('')||'<tr><td colspan="2">Нет данных</td></tr>'}</tbody></table></div><div><div class="metric" style="min-height:74px;box-shadow:none"><span>24 hours</span><strong>${stats.last24h}</strong></div><table class="stat-table"><thead><tr><th>Device</th><th>Clicks</th></tr></thead><tbody>${(stats.byDevice||[]).map((r)=>`<tr><td>${escapeHtml(r.device_type)}</td><td>${r.clicks}</td></tr>`).join('')||'<tr><td colspan="2">Нет данных</td></tr>'}</tbody></table></div><div class="wide"><table class="stat-table"><thead><tr><th>Recent</th><th>Redirect</th></tr></thead><tbody>${(stats.recent||[]).map((r)=>`<tr><td class="mono">${escapeHtml(r.country_code||'N/A')} / ${escapeHtml(r.device_type||'unknown')}</td><td>${escapeHtml(r.redirect_url||'')}</td></tr>`).join('')||'<tr><td colspan="2">Нет кликов</td></tr>'}</tbody></table></div>`}catch(e){toast(e.message,false)}}
-    $('saveBtn').addEventListener('click',saveCampaign);$('resetBtn').addEventListener('click',resetForm);$('addRuleBtn').addEventListener('click',()=>addRule({country_code:'ANY',device_type:'all',weight:100}));$('editAddRuleBtn').addEventListener('click',()=>addRule({country_code:'ANY',device_type:'all',weight:100},'editLinks'));$('saveEditBtn').addEventListener('click',saveEditCampaign);$('cancelEditBtn').addEventListener('click',closeEditModal);$('closeEditBtn').addEventListener('click',closeEditModal);$('editModal').addEventListener('click',(e)=>{if(e.target.id==='editModal')closeEditModal()});$('saveOfferBtn').addEventListener('click',saveOffer);$('resetOfferBtn').addEventListener('click',resetOfferForm);$('reloadBtn').addEventListener('click',()=>loadCampaigns());$('refreshBtn').addEventListener('click',()=>loadCampaigns());$('search').addEventListener('input',renderCampaigns);$('simulateBtn').addEventListener('click',simulate);$('statsBtn').addEventListener('click',loadStats);$('copyCurrentBtn').addEventListener('click',()=>{const slug=$('slug').value.trim();if(!slug)return toast('Slug пока пустой',false);return copyText(publicUrl(slug),'Go URL скопирован')});
-    $('campaigns').addEventListener('click',(e)=>{const b=e.target.closest('button[data-action]');if(!b)return;const id=Number(b.dataset.id);if(b.dataset.action==='edit')return editCampaign(id);if(b.dataset.action==='copy')return copyText(b.dataset.url,'Go URL скопирован');if(b.dataset.action==='open')return window.open(b.dataset.url,'_blank','noopener,noreferrer');if(b.dataset.action==='duplicate')return duplicateCampaign(id);if(b.dataset.action==='toggle')return toggleCampaign(id,b.dataset.value==='true');if(b.dataset.action==='delete')return deleteCampaign(id)});
-    $('offers').addEventListener('click',(e)=>{const b=e.target.closest('button[data-offer-action]');if(!b)return;const id=Number(b.dataset.id);if(b.dataset.offerAction==='edit')return editOffer(id);if(b.dataset.offerAction==='delete')return deleteOffer(id)});
-    resetForm();loadOffers();loadCampaigns(false);refreshIcons();
+    const state = {
+      activeTab: 'dashboard',
+      campaigns: [],
+      offers: [],
+      sources: [],
+      summary: null,
+      dashboardBreakdown: [],
+      reportBreakdown: [],
+      clicks: [],
+      conversions: [],
+      selectedCampaignId: null,
+      editingCampaignId: null,
+      editingOfferId: null,
+      editingSourceId: null,
+      endpointErrors: {},
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+    const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+    const countryNames = typeof Intl !== 'undefined' && Intl.DisplayNames ? new Intl.DisplayNames(['ru'], { type: 'region' }) : null;
+
+    const PAGE_META = {
+      dashboard: ['Control room', 'Dashboard', 'Быстрый обзор трафика, конверсий и состояния кампаний.'],
+      campaigns: ['Routing', 'Campaigns', 'Создание мультиссылок, GEO/device правила, веса, fallback и active toggle.'],
+      offers: ['Inventory', 'Offers', 'Сохраненные офферы с payout, странами, сетью, cap и заметками.'],
+      sources: ['Acquisition', 'Sources', 'Шаблоны источников трафика, postback URL и mapping входящих параметров.'],
+      reports: ['Analytics', 'Logs / Reports', 'CR, ROI, revenue, profit, breakdown, recent clicks и conversions.'],
+      tools: ['QA', 'Tools', 'Проверка редиректа без записи клика, генератор ссылок и рабочие макросы.'],
+    };
+
+    const FALLBACK_COUNTRY_CODES = [
+      'AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'AO', 'AR', 'AS', 'AT', 'AU', 'AZ',
+      'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BM', 'BN', 'BO', 'BR', 'BS', 'BT', 'BW', 'BY', 'BZ',
+      'CA', 'CD', 'CF', 'CG', 'CH', 'CI', 'CL', 'CM', 'CN', 'CO', 'CR', 'CU', 'CV', 'CY', 'CZ',
+      'DE', 'DJ', 'DK', 'DM', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ER', 'ES', 'ET',
+      'FI', 'FJ', 'FR', 'GA', 'GB', 'GD', 'GE', 'GH', 'GM', 'GN', 'GQ', 'GR', 'GT', 'GU', 'GW', 'GY',
+      'HK', 'HN', 'HR', 'HT', 'HU', 'ID', 'IE', 'IL', 'IN', 'IQ', 'IR', 'IS', 'IT',
+      'JM', 'JO', 'JP', 'KE', 'KG', 'KH', 'KM', 'KN', 'KP', 'KR', 'KW', 'KZ',
+      'LA', 'LB', 'LC', 'LK', 'LR', 'LS', 'LT', 'LU', 'LV', 'LY',
+      'MA', 'MD', 'ME', 'MG', 'MK', 'ML', 'MM', 'MN', 'MO', 'MR', 'MT', 'MU', 'MV', 'MW', 'MX', 'MY', 'MZ',
+      'NA', 'NE', 'NG', 'NI', 'NL', 'NO', 'NP', 'NZ', 'OM', 'PA', 'PE', 'PG', 'PH', 'PK', 'PL', 'PR', 'PS', 'PT', 'PY',
+      'QA', 'RO', 'RS', 'RU', 'RW', 'SA', 'SC', 'SD', 'SE', 'SG', 'SI', 'SK', 'SL', 'SN', 'SO', 'SR', 'SV', 'SY',
+      'TH', 'TJ', 'TM', 'TN', 'TR', 'TT', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY', 'UZ',
+      'VE', 'VN', 'YE', 'ZA', 'ZM', 'ZW'
+    ];
+    function supportedCountryCodes() {
+      try {
+        if (typeof Intl !== 'undefined' && Intl.supportedValuesOf) return Intl.supportedValuesOf('region');
+      } catch (_error) {}
+      return FALLBACK_COUNTRY_CODES;
+    }
+
+    const COUNTRY_CODES = ['*', ...supportedCountryCodes()];
+
+    function icon(name, extra = '') { return `<i data-lucide="${name}" ${extra}></i>`; }
+    function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+      }[char]));
+    }
+
+    function api(path, options = {}) {
+      return fetch(path, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+      }).then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+        return data;
+      });
+    }
+
+    async function safeApi(key, path, options = {}) {
+      try {
+        const data = await api(path, options);
+        delete state.endpointErrors[key];
+        return data;
+      } catch (error) {
+        state.endpointErrors[key] = error.message;
+        return null;
+      }
+    }
+
+    function toast(message, ok = true) {
+      const node = $('toast');
+      node.textContent = message;
+      node.style.background = ok ? 'var(--black)' : 'var(--red)';
+      node.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => node.classList.remove('show'), 3200);
+    }
+
+    function publicUrl(slug) { return `${location.origin}/go/${slug}`; }
+    function asArray(value) { return Array.isArray(value) ? value : []; }
+    function fmtMoney(value) { return money.format(Number(value || 0)); }
+    function fmtPct(value) { return `${number.format(Number(value || 0))}%`; }
+    function fmtDate(value) { return value ? new Date(value).toLocaleString('ru-RU') : '-'; }
+
+    function normalizeCountry(value) {
+      const code = String(value || '').trim().toUpperCase();
+      if (!code || code === 'ANY' || code === 'ALL' || code === '*') return '*';
+      return code;
+    }
+
+    function countryLabel(code) {
+      const normalized = normalizeCountry(code);
+      if (normalized === '*') return 'ANY - Любая страна';
+      return `${normalized} - ${countryNames?.of(normalized) || normalized}`;
+    }
+
+    function countryOptions(selected, includeAny = true) {
+      const selectedCode = normalizeCountry(selected);
+      return COUNTRY_CODES
+        .filter((code) => includeAny || code !== '*')
+        .map((code) => `<option value="${code}" ${normalizeCountry(code) === selectedCode ? 'selected' : ''}>${escapeHtml(countryLabel(code))}</option>`)
+        .join('');
+    }
+
+    function selectedCountries(select) {
+      return [...select.selectedOptions].map((option) => normalizeCountry(option.value)).filter((code) => code !== '*');
+    }
+
+    function sourceExternalId(source) {
+      return source.external_id_param || source.params?.external_id_param || '';
+    }
+
+    function sourceMappings(source) {
+      return source.param_mappings || source.mappings || source.params?.param_mappings || source.params || {};
+    }
+
+    function openModal(id) {
+      $(id).classList.add('open');
+      $(id).setAttribute('aria-hidden', 'false');
+      refreshIcons();
+    }
+
+    function closeModal(id) {
+      $(id).classList.remove('open');
+      $(id).setAttribute('aria-hidden', 'true');
+      if (id === 'campaignModal') state.editingCampaignId = null;
+      if (id === 'offerModal') state.editingOfferId = null;
+      if (id === 'sourceModal') state.editingSourceId = null;
+    }
+
+    function setActiveTab(tab) {
+      state.activeTab = tab;
+      document.querySelectorAll('.nav button').forEach((button) => button.classList.toggle('active', button.dataset.tab === tab));
+      document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${tab}`));
+      const [eyebrow, title, description] = PAGE_META[tab];
+      $('pageEyebrow').textContent = eyebrow;
+      $('pageTitle').textContent = title;
+      $('pageDescription').textContent = description;
+      renderPageActions(tab);
+      refreshIcons();
+    }
+
+    function renderPageActions(tab) {
+      const actions = {
+        dashboard: `<button class="secondary" id="actionRefreshDashboard">${icon('refresh-cw')}Обновить</button>`,
+        campaigns: `<button class="success" id="actionNewCampaign">${icon('plus')}Новая кампания</button>`,
+        offers: `<button class="success" id="actionNewOffer">${icon('plus')}Новый оффер</button>`,
+        sources: `<button class="success" id="actionNewSource">${icon('plus')}Новый источник</button>`,
+        reports: `<button class="secondary" id="actionRefreshReports">${icon('refresh-cw')}Обновить отчеты</button>`,
+        tools: `<button class="secondary" id="actionCopyPostback">${icon('copy')}Postback URL</button>`,
+      };
+      $('pageActions').innerHTML = actions[tab] || '';
+      $('actionRefreshDashboard')?.addEventListener('click', loadDashboardData);
+      $('actionNewCampaign')?.addEventListener('click', () => openCampaignEditor());
+      $('actionNewOffer')?.addEventListener('click', () => openOfferEditor());
+      $('actionNewSource')?.addEventListener('click', () => openSourceEditor());
+      $('actionRefreshReports')?.addEventListener('click', loadReports);
+      $('actionCopyPostback')?.addEventListener('click', () => copyText(`${location.origin}/postback?subid={click_id}&status=lead&payout={payout}&tid={transaction_id}`, 'Postback URL скопирован'));
+    }
+
+    function apiState(message, isError = false) {
+      return `<div class="api-state ${isError ? 'error' : ''}">${escapeHtml(message)}</div>`;
+    }
+
+    function renderKpis(targetId, summary) {
+      const data = summary || {};
+      const clicksFallback = state.campaigns.reduce((sum, item) => sum + Number(item.click_count || 0), 0);
+      const cards = [
+        ['Clicks', data.clicks ?? clicksFallback, 'green', 'Все переходы'],
+        ['Unique', data.unique_clicks ?? data.unique ?? '-', 'blue', 'Уникальные клики'],
+        ['Conv.', data.conversions ?? 0, 'green', 'Все postback события'],
+        ['Revenue', fmtMoney(data.revenue), 'amber', 'Доход'],
+        ['Profit', fmtMoney(data.profit), Number(data.profit || 0) < 0 ? 'red' : 'green', 'Доход минус cost'],
+        ['ROI', fmtPct(data.roi), Number(data.roi || 0) < 0 ? 'red' : 'blue', 'Return on investment'],
+        ['CR', fmtPct(data.cr), 'blue', 'Conversion rate'],
+      ];
+      $(targetId).innerHTML = cards.map(([label, value, color, help]) => `
+        <article class="stat-card ${color}">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <small>${escapeHtml(help)}</small>
+        </article>
+      `).join('');
+    }
+
+    function renderDashboardCampaigns() {
+      const list = state.campaigns.slice(0, 6);
+      if (!list.length) {
+        $('dashboardCampaigns').innerHTML = apiState('Кампаний пока нет. Создай первую мультиссылку во вкладке Campaigns.');
+        return;
+      }
+      $('dashboardCampaigns').innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Status</th><th>Rules</th><th>Clicks</th><th>Go URL</th></tr></thead>
+        <tbody>${list.map((campaign) => `<tr>
+          <td><strong>${escapeHtml(campaign.name)}</strong><div class="mono muted">${escapeHtml(campaign.slug)}</div></td>
+          <td><span class="pill ${campaign.is_active ? 'on' : 'off'}">${campaign.is_active ? 'active' : 'paused'}</span></td>
+          <td class="mono">${Number(campaign.link_count || 0)}</td>
+          <td class="mono">${Number(campaign.click_count || 0)}</td>
+          <td><button class="icon secondary" title="Copy" data-copy="${escapeHtml(publicUrl(campaign.slug))}">${icon('copy')}</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+      refreshIcons();
+    }
+
+    function renderBreakdown(targetId, rows, errorKey) {
+      if (state.endpointErrors[errorKey]) {
+        $(targetId).innerHTML = apiState(`Endpoint пока недоступен: ${state.endpointErrors[errorKey]}`, true);
+        return;
+      }
+      const list = asArray(rows);
+      if (!list.length) {
+        $(targetId).innerHTML = apiState('Данных для breakdown пока нет. После подключения reports API здесь появятся группировки.');
+        return;
+      }
+      $(targetId).innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th>Group</th><th>Clicks</th><th>Unique</th><th>Conv.</th><th>CR</th><th>Revenue</th><th>Profit</th><th>ROI</th></tr></thead>
+        <tbody>${list.map((row) => `<tr>
+          <td><strong>${escapeHtml(row.group || row.name || row.key || '-')}</strong></td>
+          <td class="mono">${Number(row.clicks || 0)}</td>
+          <td class="mono">${row.unique_clicks ?? row.unique ?? '-'}</td>
+          <td class="mono">${Number(row.conversions || 0)}</td>
+          <td class="mono">${fmtPct(row.cr)}</td>
+          <td class="mono">${fmtMoney(row.revenue)}</td>
+          <td class="mono">${fmtMoney(row.profit)}</td>
+          <td class="mono">${fmtPct(row.roi)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+
+    function campaignRows() {
+      const query = $('campaignSearch').value.trim().toLowerCase();
+      const status = $('campaignStatusFilter').value;
+      return state.campaigns.filter((campaign) => {
+        const matchesQuery = !query || String(campaign.name || '').toLowerCase().includes(query) || String(campaign.slug || '').toLowerCase().includes(query);
+        const matchesStatus = status === 'all' || (status === 'active' ? campaign.is_active : !campaign.is_active);
+        return matchesQuery && matchesStatus;
+      });
+    }
+
+    function renderCampaigns() {
+      const list = campaignRows();
+      syncCampaignSelects();
+      if (!list.length) {
+        $('campaignsTable').innerHTML = apiState('Кампаний нет или фильтр ничего не нашел.');
+        return;
+      }
+      $('campaignsTable').innerHTML = `<table>
+        <thead><tr><th>Campaign</th><th>Status</th><th>Rules</th><th>Clicks</th><th>24h</th><th>Default URL</th><th class="right">Actions</th></tr></thead>
+        <tbody>${list.map((campaign) => `<tr>
+          <td><strong>${escapeHtml(campaign.name)}</strong><div class="mono muted">/${escapeHtml(campaign.slug)}</div></td>
+          <td><span class="pill ${campaign.is_active ? 'on' : 'off'}">${campaign.is_active ? 'active' : 'paused'}</span></td>
+          <td class="mono">${Number(campaign.link_count || 0)}</td>
+          <td class="mono">${Number(campaign.click_count || 0)}</td>
+          <td class="mono">${Number(campaign.clicks_24h || 0)}</td>
+          <td class="truncate">${escapeHtml(campaign.default_url || '')}</td>
+          <td><div class="row-actions">
+            <button class="icon secondary" title="Редактировать" data-campaign-action="edit" data-id="${campaign.id}">${icon('square-pen')}</button>
+            <button class="icon secondary" title="Скопировать Go URL" data-copy="${escapeHtml(publicUrl(campaign.slug))}">${icon('copy')}</button>
+            <button class="icon secondary" title="Открыть" data-open="${escapeHtml(publicUrl(campaign.slug))}">${icon('external-link')}</button>
+            <button class="icon secondary" title="Дублировать" data-campaign-action="duplicate" data-id="${campaign.id}">${icon('copy-plus')}</button>
+            <button class="icon ${campaign.is_active ? 'secondary' : 'success'}" title="${campaign.is_active ? 'Выключить' : 'Включить'}" data-campaign-action="toggle" data-id="${campaign.id}" data-value="${campaign.is_active ? 'false' : 'true'}">${icon(campaign.is_active ? 'pause' : 'play')}</button>
+            <button class="icon danger" title="Удалить" data-campaign-action="delete" data-id="${campaign.id}">${icon('trash-2')}</button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+      refreshIcons();
+    }
+
+    function offerRows() {
+      const query = $('offerSearch').value.trim().toLowerCase();
+      const status = $('offerStatusFilter').value;
+      return state.offers.filter((offer) => {
+        const haystack = [offer.name, offer.url, offer.affiliate_network, asArray(offer.countries).join(' ')].join(' ').toLowerCase();
+        const active = offer.is_active !== false;
+        return (!query || haystack.includes(query)) && (status === 'all' || (status === 'active' ? active : !active));
+      });
+    }
+
+    function renderOffers() {
+      const list = offerRows();
+      syncOfferChoices();
+      if (state.endpointErrors.offers) {
+        $('offersTable').innerHTML = apiState(`Офферы временно недоступны: ${state.endpointErrors.offers}`, true);
+        return;
+      }
+      if (!list.length) {
+        $('offersTable').innerHTML = apiState('Сохраненных офферов пока нет. Создай оффер, чтобы выбирать его в правилах кампании.');
+        return;
+      }
+      $('offersTable').innerHTML = `<table>
+        <thead><tr><th>Offer</th><th>Status</th><th>Countries</th><th>Network</th><th>Payout</th><th>Cap</th><th class="right">Actions</th></tr></thead>
+        <tbody>${list.map((offer) => `<tr>
+          <td><strong>${escapeHtml(offer.name)}</strong><div class="mono muted truncate">${escapeHtml(offer.url)}</div></td>
+          <td><span class="pill ${offer.is_active === false ? 'off' : 'on'}">${offer.is_active === false ? 'paused' : 'active'}</span></td>
+          <td>${asArray(offer.countries).length ? asArray(offer.countries).map((code) => `<span class="pill">${escapeHtml(code)}</span>`).join(' ') : '<span class="muted">-</span>'}</td>
+          <td>${escapeHtml(offer.affiliate_network || '-')}</td>
+          <td class="mono">${escapeHtml(offer.payout_type || 'CPA')} ${Number(offer.payout || 0) ? fmtMoney(offer.payout) : '-'}</td>
+          <td class="mono">${offer.conversion_cap || '-'}</td>
+          <td><div class="row-actions">
+            <button class="icon secondary" title="Редактировать" data-offer-action="edit" data-id="${offer.id}">${icon('square-pen')}</button>
+            <button class="icon secondary" title="Скопировать URL" data-copy="${escapeHtml(offer.url)}">${icon('copy')}</button>
+            <button class="icon danger" title="Удалить" data-offer-action="delete" data-id="${offer.id}">${icon('trash-2')}</button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+      refreshIcons();
+    }
+
+    function sourceRows() {
+      const query = $('sourceSearch').value.trim().toLowerCase();
+      return state.sources.filter((source) => !query || [source.name, source.postback_url, sourceExternalId(source), JSON.stringify(sourceMappings(source))].join(' ').toLowerCase().includes(query));
+    }
+
+    function renderSources() {
+      if (state.endpointErrors.sources) {
+        $('sourcesTable').innerHTML = apiState(`Sources API пока недоступен: ${state.endpointErrors.sources}`, true);
+        return;
+      }
+      const list = sourceRows();
+      if (!list.length) {
+        $('sourcesTable').innerHTML = apiState('Источников пока нет. Когда backend будет готов, здесь можно хранить шаблоны Facebook/TikTok/Google/Push.');
+        return;
+      }
+      $('sourcesTable').innerHTML = `<table>
+        <thead><tr><th>Source</th><th>External ID</th><th>Mappings</th><th>Postback</th><th class="right">Actions</th></tr></thead>
+        <tbody>${list.map((source) => `<tr>
+          <td><strong>${escapeHtml(source.name)}</strong></td>
+          <td class="mono">${escapeHtml(sourceExternalId(source) || '-')}</td>
+          <td class="mono truncate">${escapeHtml(JSON.stringify(sourceMappings(source)))}</td>
+          <td class="truncate">${escapeHtml(source.postback_url || '-')}</td>
+          <td><div class="row-actions">
+            <button class="icon secondary" title="Редактировать" data-source-action="edit" data-id="${source.id}">${icon('square-pen')}</button>
+            <button class="icon danger" title="Удалить" data-source-action="delete" data-id="${source.id}">${icon('trash-2')}</button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+      refreshIcons();
+    }
+
+    function renderLogs() {
+      if (state.endpointErrors.clicks) {
+        $('clicksLog').innerHTML = apiState(`Clicks endpoint пока недоступен: ${state.endpointErrors.clicks}`, true);
+      } else if (!state.clicks.length) {
+        $('clicksLog').innerHTML = apiState('Кликов пока нет или clicks API еще не возвращает данные.');
+      } else {
+        $('clicksLog').innerHTML = `<div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Click ID</th><th>Campaign</th><th>Geo</th><th>Device</th><th>Redirect</th></tr></thead>
+          <tbody>${state.clicks.map((click) => `<tr>
+            <td class="mono nowrap">${fmtDate(click.created_at)}</td>
+            <td class="mono copyable" data-copy="${escapeHtml(click.click_id || click.id || '')}">${escapeHtml(click.click_id || click.id || '-')}</td>
+            <td>${escapeHtml(click.campaign_name || click.campaign_id || '-')}</td>
+            <td class="mono">${escapeHtml(click.country_code || '-')}</td>
+            <td class="mono">${escapeHtml(click.device_type || '-')}</td>
+            <td class="truncate">${escapeHtml(click.redirect_url || '')}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>`;
+      }
+
+      if (state.endpointErrors.conversions) {
+        $('conversionsLog').innerHTML = apiState(`Conversions endpoint пока недоступен: ${state.endpointErrors.conversions}`, true);
+      } else if (!state.conversions.length) {
+        $('conversionsLog').innerHTML = apiState('Конверсий пока нет или conversions API еще не возвращает данные.');
+      } else {
+        $('conversionsLog').innerHTML = `<div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Click ID</th><th>Status</th><th>Payout</th><th>Transaction</th></tr></thead>
+          <tbody>${state.conversions.map((conversion) => `<tr>
+            <td class="mono nowrap">${fmtDate(conversion.created_at)}</td>
+            <td class="mono copyable" data-copy="${escapeHtml(conversion.click_id || conversion.subid || '')}">${escapeHtml(conversion.click_id || conversion.subid || '-')}</td>
+            <td><span class="pill on">${escapeHtml(conversion.status || 'lead')}</span></td>
+            <td class="mono">${fmtMoney(conversion.payout)}</td>
+            <td class="mono">${escapeHtml(conversion.tid || conversion.transaction_id || '-')}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>`;
+      }
+    }
+
+    function renderApiHealth() {
+      const errors = Object.keys(state.endpointErrors).length;
+      $('apiHealth').textContent = errors ? `${errors} API pending` : 'API ready';
+      $('apiHealth').className = `pill ${errors ? 'off' : 'info'}`;
+    }
+
+    function renderAll() {
+      renderKpis('dashboardKpis', state.summary);
+      renderKpis('reportKpis', state.summary);
+      renderDashboardCampaigns();
+      renderBreakdown('dashboardBreakdown', state.dashboardBreakdown, 'dashboardBreakdown');
+      renderBreakdown('reportBreakdown', state.reportBreakdown, 'reportBreakdown');
+      renderCampaigns();
+      renderOffers();
+      renderSources();
+      renderLogs();
+      renderApiHealth();
+      $('postbackExample').textContent = `${location.origin}/postback?subid={click_id}&status=lead&payout={payout}&tid={transaction_id}`;
+      refreshIcons();
+    }
+
+    function defaultRule() { return { country_code: '*', device_type: 'all', weight: 100, url: '', offer_id: '' }; }
+
+    function offerOptions(selectedId, selectedUrl) {
+      const matched = selectedId ? state.offers.find((offer) => Number(offer.id) === Number(selectedId)) : state.offers.find((offer) => offer.url === selectedUrl);
+      return `<option value="">Своя ссылка / override URL</option>` + state.offers.map((offer) => (
+        `<option value="${offer.id}" data-url="${escapeHtml(offer.url)}" ${matched && Number(matched.id) === Number(offer.id) ? 'selected' : ''}>${escapeHtml(offer.name)}${offer.is_active === false ? ' (paused)' : ''}</option>`
+      )).join('');
+    }
+
+    function addRule(link = defaultRule()) {
+      const wrap = document.createElement('div');
+      wrap.className = 'rule';
+      wrap.innerHTML = `
+        <label>Country<select class="rule-country">${countryOptions(link.country_code)}</select></label>
+        <label>Saved offer<select class="rule-offer">${offerOptions(link.offer_id, link.url)}</select></label>
+        <label>Override URL<input class="rule-url" type="url" placeholder="https://offer.example/path" value="${escapeHtml(link.url || '')}"></label>
+        <label>Device<select class="rule-device">${['all', 'desktop', 'mobile', 'tablet'].map((device) => `<option value="${device}" ${device === (link.device_type || 'all') ? 'selected' : ''}>${device}</option>`).join('')}</select></label>
+        <label>Weight<input class="rule-weight" type="number" min="1" value="${escapeHtml(link.weight || 100)}"></label>
+        <button type="button" class="icon danger rule-delete" title="Удалить правило">${icon('trash-2')}</button>
+      `;
+      wrap.querySelector('.rule-offer').addEventListener('change', (event) => {
+        const option = event.currentTarget.selectedOptions[0];
+        if (option?.dataset.url) wrap.querySelector('.rule-url').value = option.dataset.url;
+      });
+      wrap.querySelector('.rule-delete').addEventListener('click', () => wrap.remove());
+      $('campaignRules').appendChild(wrap);
+      refreshIcons();
+    }
+
+    function collectRules() {
+      return [...document.querySelectorAll('#campaignRules .rule')]
+        .map((row) => ({
+          country_code: normalizeCountry(row.querySelector('.rule-country').value),
+          offer_id: row.querySelector('.rule-offer').value ? Number(row.querySelector('.rule-offer').value) : null,
+          url: row.querySelector('.rule-url').value.trim(),
+          device_type: row.querySelector('.rule-device').value,
+          weight: Math.max(Number(row.querySelector('.rule-weight').value || 100), 1),
+        }))
+        .filter((rule) => rule.url || rule.offer_id);
+    }
+
+    function openCampaignEditor(id = null) {
+      state.editingCampaignId = id;
+      $('campaignModalTitle').textContent = id ? `Редактирование кампании #${id}` : 'Новая кампания';
+      $('campaignName').value = '';
+      $('campaignSlug').value = '';
+      $('campaignDefaultUrl').value = '';
+      $('campaignClickLimit').value = '';
+      $('campaignActive').checked = true;
+      $('campaignBlockBots').checked = true;
+      $('campaignRules').innerHTML = '';
+      addRule(defaultRule());
+      openModal('campaignModal');
+
+      if (id) loadCampaignForEdit(id);
+    }
+
+    async function loadCampaignForEdit(id) {
+      const data = await safeApi('campaign', `/api/admin/tds/campaigns/${id}`);
+      if (!data) return toast(state.endpointErrors.campaign || 'Не удалось загрузить кампанию', false);
+      const campaign = data.campaign || {};
+      $('campaignName').value = campaign.name || '';
+      $('campaignSlug').value = campaign.slug || '';
+      $('campaignDefaultUrl').value = campaign.default_url || '';
+      $('campaignClickLimit').value = campaign.click_limit || '';
+      $('campaignActive').checked = campaign.is_active !== false;
+      $('campaignBlockBots').checked = campaign.block_bots !== false;
+      $('campaignRules').innerHTML = '';
+      (asArray(data.links).length ? data.links : [defaultRule()]).forEach(addRule);
+    }
+
+    function campaignPayload() {
+      return {
+        name: $('campaignName').value.trim(),
+        slug: $('campaignSlug').value.trim(),
+        default_url: $('campaignDefaultUrl').value.trim(),
+        click_limit: $('campaignClickLimit').value ? Number($('campaignClickLimit').value) : null,
+        start_date: null,
+        end_date: null,
+        is_active: $('campaignActive').checked,
+        block_bots: $('campaignBlockBots').checked,
+        links: collectRules(),
+      };
+    }
+
+    async function saveCampaign() {
+      try {
+        const id = state.editingCampaignId;
+        const path = id ? `/api/admin/tds/campaigns/${id}` : '/api/admin/tds/campaigns';
+        const method = id ? 'PUT' : 'POST';
+        const data = await api(path, { method, body: JSON.stringify(campaignPayload()) });
+        state.selectedCampaignId = data.campaign?.id || id;
+        toast(id ? 'Кампания обновлена' : 'Кампания создана');
+        closeModal('campaignModal');
+        await loadCampaigns(false);
+        await loadDashboardData(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function toggleCampaign(id, value) {
+      try {
+        await api(`/api/admin/tds/campaigns/${id}/status`, { method: 'PATCH', body: JSON.stringify({ is_active: value }) });
+        await loadCampaigns(false);
+        renderKpis('dashboardKpis', state.summary);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function duplicateCampaign(id) {
+      try {
+        const data = await api(`/api/admin/tds/campaigns/${id}/duplicate`, { method: 'POST', body: '{}' });
+        toast('Копия создана и оставлена выключенной');
+        await loadCampaigns(false);
+        openCampaignEditor(data.campaign.id);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function deleteCampaign(id) {
+      if (!confirm(`Удалить кампанию #${id}?`)) return;
+      try {
+        await api(`/api/admin/tds/campaigns/${id}`, { method: 'DELETE' });
+        toast('Кампания удалена');
+        await loadCampaigns(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function openOfferEditor(id = null) {
+      state.editingOfferId = id;
+      const offer = id ? state.offers.find((item) => Number(item.id) === Number(id)) : null;
+      $('offerModalTitle').textContent = id ? `Редактирование оффера #${id}` : 'Новый оффер';
+      $('offerName').value = offer?.name || '';
+      $('offerNetwork').value = offer?.affiliate_network || '';
+      $('offerUrl').value = offer?.url || '';
+      $('offerPayoutType').value = offer?.payout_type || 'CPA';
+      $('offerPayout').value = offer?.payout || '';
+      $('offerCap').value = offer?.conversion_cap || '';
+      $('offerNotes').value = offer?.notes || '';
+      $('offerActive').checked = offer?.is_active !== false;
+      $('offerCountries').innerHTML = COUNTRY_CODES.filter((code) => code !== '*').map((code) => `<option value="${code}" ${asArray(offer?.countries).includes(code) ? 'selected' : ''}>${escapeHtml(countryLabel(code))}</option>`).join('');
+      openModal('offerModal');
+    }
+
+    function offerPayload() {
+      return {
+        name: $('offerName').value.trim(),
+        url: $('offerUrl').value.trim(),
+        payout_type: $('offerPayoutType').value,
+        payout: $('offerPayout').value ? Number($('offerPayout').value) : null,
+        countries: selectedCountries($('offerCountries')),
+        affiliate_network: $('offerNetwork').value.trim(),
+        notes: $('offerNotes').value.trim(),
+        is_active: $('offerActive').checked,
+        conversion_cap: $('offerCap').value ? Number($('offerCap').value) : null,
+      };
+    }
+
+    async function saveOffer() {
+      try {
+        const id = state.editingOfferId;
+        const path = id ? `/api/admin/tds/offers/${id}` : '/api/admin/tds/offers';
+        const method = id ? 'PUT' : 'POST';
+        await api(path, { method, body: JSON.stringify(offerPayload()) });
+        toast(id ? 'Оффер обновлен' : 'Оффер создан');
+        closeModal('offerModal');
+        await loadOffers(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function deleteOffer(id) {
+      if (!confirm(`Удалить оффер #${id}?`)) return;
+      try {
+        await api(`/api/admin/tds/offers/${id}`, { method: 'DELETE' });
+        toast('Оффер удален');
+        await loadOffers(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function openSourceEditor(id = null) {
+      state.editingSourceId = id;
+      const source = id ? state.sources.find((item) => Number(item.id) === Number(id)) : null;
+      $('sourceModalTitle').textContent = id ? `Редактирование источника #${id}` : 'Новый источник';
+      $('sourceName').value = source?.name || '';
+      $('sourceExternalId').value = source ? sourceExternalId(source) : '';
+      $('sourcePostbackUrl').value = source?.postback_url || '';
+      $('sourceMappings').value = JSON.stringify(source ? sourceMappings(source) : { campaign_id: 'utm_campaign', creative_id: 'utm_content', cost: 'cost', sub_id_1: 'adset' }, null, 2);
+      openModal('sourceModal');
+    }
+
+    function sourcePayload() {
+      let mappings = {};
+      try {
+        mappings = $('sourceMappings').value.trim() ? JSON.parse($('sourceMappings').value) : {};
+      } catch (_error) {
+        throw new Error('Param mappings должен быть валидным JSON');
+      }
+      return {
+        name: $('sourceName').value.trim(),
+        external_id_param: $('sourceExternalId').value.trim(),
+        postback_url: $('sourcePostbackUrl').value.trim(),
+        param_mappings: mappings,
+        params: {
+          external_id_param: $('sourceExternalId').value.trim(),
+          param_mappings: mappings,
+        },
+      };
+    }
+
+    async function saveSource() {
+      try {
+        const id = state.editingSourceId;
+        const path = id ? `/api/admin/tds/sources/${id}` : '/api/admin/tds/sources';
+        const method = id ? 'PUT' : 'POST';
+        await api(path, { method, body: JSON.stringify(sourcePayload()) });
+        toast(id ? 'Источник обновлен' : 'Источник создан');
+        closeModal('sourceModal');
+        await loadSources(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    async function deleteSource(id) {
+      if (!confirm(`Удалить источник #${id}?`)) return;
+      const data = await safeApi('sources', `/api/admin/tds/sources/${id}`, { method: 'DELETE' });
+      if (data) toast('Источник удален');
+      else toast(state.endpointErrors.sources || 'Sources API недоступен', false);
+      await loadSources(false);
+    }
+
+    function syncCampaignSelects() {
+      const html = state.campaigns.map((campaign) => `<option value="${campaign.id}">${escapeHtml(campaign.name)} / ${escapeHtml(campaign.slug)}</option>`).join('');
+      ['simCampaign', 'builderCampaign'].forEach((id) => {
+        const node = $(id);
+        if (!node) return;
+        const current = node.value;
+        node.innerHTML = html || '<option value="">Кампаний нет</option>';
+        if (current) node.value = current;
+      });
+      if (!state.selectedCampaignId && state.campaigns[0]) state.selectedCampaignId = state.campaigns[0].id;
+      if ($('simCampaign')) $('simCampaign').value = state.selectedCampaignId || state.campaigns[0]?.id || '';
+      if ($('builderCampaign')) $('builderCampaign').value = state.selectedCampaignId || state.campaigns[0]?.id || '';
+    }
+
+    function syncOfferChoices() {
+      document.querySelectorAll('.rule').forEach((row) => {
+        const select = row.querySelector('.rule-offer');
+        const url = row.querySelector('.rule-url').value.trim();
+        const current = select.value;
+        select.innerHTML = offerOptions(current, url);
+      });
+    }
+
+    function initStaticSelects() {
+      $('simCountry').innerHTML = countryOptions('KZ');
+      $('offerCountries').innerHTML = COUNTRY_CODES.filter((code) => code !== '*').map((code) => `<option value="${code}">${escapeHtml(countryLabel(code))}</option>`).join('');
+    }
+
+    async function loadCampaigns(showToast = false) {
+      const data = await safeApi('campaigns', '/api/admin/tds/campaigns');
+      if (data) state.campaigns = data.campaigns || [];
+      renderCampaigns();
+      renderDashboardCampaigns();
+      renderApiHealth();
+      if (showToast && data) toast('Кампании обновлены');
+    }
+
+    async function loadOffers(showToast = false) {
+      const data = await safeApi('offers', '/api/admin/tds/offers');
+      if (data) state.offers = data.offers || [];
+      renderOffers();
+      renderApiHealth();
+      if (showToast && data) toast('Офферы обновлены');
+    }
+
+    async function loadSources(showToast = false) {
+      const data = await safeApi('sources', '/api/admin/tds/sources');
+      if (data) state.sources = data.sources || [];
+      renderSources();
+      renderApiHealth();
+      if (showToast && data) toast('Источники обновлены');
+    }
+
+    async function loadDashboardData(showToast = false) {
+      const summary = await safeApi('summary', '/api/admin/tds/reports/summary');
+      if (summary) state.summary = summary.summary || summary.data || summary;
+      const group = $('dashboardGroup')?.value || 'campaign';
+      const breakdown = await safeApi('dashboardBreakdown', `/api/admin/tds/reports/breakdown?group=${encodeURIComponent(group)}`);
+      if (breakdown) state.dashboardBreakdown = breakdown.rows || breakdown.breakdown || breakdown.data || [];
+      renderKpis('dashboardKpis', state.summary);
+      renderKpis('reportKpis', state.summary);
+      renderBreakdown('dashboardBreakdown', state.dashboardBreakdown, 'dashboardBreakdown');
+      renderApiHealth();
+      if (showToast) toast('Dashboard обновлен');
+    }
+
+    async function loadReports() {
+      const group = $('reportGroup')?.value || 'campaign';
+      const summary = await safeApi('summary', '/api/admin/tds/reports/summary');
+      if (summary) state.summary = summary.summary || summary.data || summary;
+      const breakdown = await safeApi('reportBreakdown', `/api/admin/tds/reports/breakdown?group=${encodeURIComponent(group)}`);
+      if (breakdown) state.reportBreakdown = breakdown.rows || breakdown.breakdown || breakdown.data || [];
+      const clicks = await safeApi('clicks', '/api/admin/tds/clicks?limit=50');
+      if (clicks) state.clicks = clicks.clicks || clicks.rows || clicks.data || [];
+      const conversions = await safeApi('conversions', '/api/admin/tds/conversions?limit=50');
+      if (conversions) state.conversions = conversions.conversions || conversions.rows || conversions.data || [];
+      renderKpis('dashboardKpis', state.summary);
+      renderKpis('reportKpis', state.summary);
+      renderBreakdown('reportBreakdown', state.reportBreakdown, 'reportBreakdown');
+      renderLogs();
+      renderApiHealth();
+    }
+
+    async function refreshAll() {
+      await Promise.all([loadCampaigns(false), loadOffers(false), loadSources(false)]);
+      await Promise.all([loadDashboardData(false), loadReports()]);
+      renderAll();
+    }
+
+    async function simulate() {
+      const id = $('simCampaign').value;
+      if (!id) return toast('Сначала выбери кампанию', false);
+      state.selectedCampaignId = id;
+      const country = encodeURIComponent($('simCountry').value || 'ANY');
+      const device = encodeURIComponent($('simDevice').value || 'desktop');
+      const data = await safeApi('simulate', `/api/admin/tds/campaigns/${id}/simulate?country=${country}&device=${device}`);
+      if (!data) {
+        $('simulateResult').className = 'url-box api-state error';
+        $('simulateResult').textContent = state.endpointErrors.simulate || 'Не удалось проверить маршрут';
+        return;
+      }
+      const result = data.result || {};
+      $('simulateResult').className = 'url-box';
+      $('simulateResult').innerHTML = `
+        <div class="mono">${escapeHtml(result.country_code)} / ${escapeHtml(result.device_type)} / ${escapeHtml($('simSource').value || 'test')}</div>
+        <strong>${result.used_default ? 'Default URL' : 'Matched rule'}</strong>
+        <div><a href="${escapeHtml(result.redirect_url)}" target="_blank" rel="noreferrer">${escapeHtml(result.redirect_url)}</a></div>
+      `;
+    }
+
+    function buildTrackingUrl() {
+      const campaign = state.campaigns.find((item) => Number(item.id) === Number($('builderCampaign').value));
+      if (!campaign) return toast('Выбери кампанию', false);
+      const url = new URL(publicUrl(campaign.slug));
+      const params = {
+        source: $('builderSource').value.trim(),
+        cost: $('builderCost').value.trim(),
+        sub_id_1: $('builderSub1').value.trim(),
+        sub_id_2: $('builderSub2').value.trim(),
+      };
+      Object.entries(params).forEach(([key, value]) => { if (value) url.searchParams.set(key, value); });
+      $('builtUrl').className = 'url-box';
+      $('builtUrl').innerHTML = `<span class="mono">${escapeHtml(url.toString())}</span><div style="margin-top:8px;"><button class="secondary" data-copy="${escapeHtml(url.toString())}">${icon('copy')}Скопировать</button></div>`;
+      refreshIcons();
+    }
+
+    async function copyText(text, label = 'Скопировано') {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast(label);
+      } catch (_error) {
+        toast('Clipboard недоступен в браузере', false);
+      }
+    }
+
+    document.addEventListener('click', (event) => {
+      const nav = event.target.closest('[data-tab]');
+      if (nav) return setActiveTab(nav.dataset.tab);
+
+      const jump = event.target.closest('[data-tab-jump]');
+      if (jump) return setActiveTab(jump.dataset.tabJump);
+
+      const close = event.target.closest('[data-close-modal]');
+      if (close) return closeModal(close.dataset.closeModal);
+
+      const copy = event.target.closest('[data-copy]');
+      if (copy) return copyText(copy.dataset.copy);
+
+      const open = event.target.closest('[data-open]');
+      if (open) return window.open(open.dataset.open, '_blank', 'noopener,noreferrer');
+    });
+
+    document.querySelectorAll('.modal-backdrop').forEach((modal) => {
+      modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(modal.id); });
+    });
+
+    document.querySelectorAll('.nav button').forEach((button) => button.addEventListener('click', () => setActiveTab(button.dataset.tab)));
+
+    $('globalRefreshBtn').addEventListener('click', refreshAll);
+    $('newCampaignBtn').addEventListener('click', () => openCampaignEditor());
+    $('newOfferBtn').addEventListener('click', () => openOfferEditor());
+    $('newSourceBtn').addEventListener('click', () => openSourceEditor());
+    $('reloadCampaignsBtn').addEventListener('click', () => loadCampaigns(true));
+    $('reloadOffersBtn').addEventListener('click', () => loadOffers(true));
+    $('reloadSourcesBtn').addEventListener('click', () => loadSources(true));
+    $('reloadReportsBtn').addEventListener('click', loadReports);
+    $('addRuleBtn').addEventListener('click', () => addRule(defaultRule()));
+    $('saveCampaignBtn').addEventListener('click', saveCampaign);
+    $('saveOfferBtn').addEventListener('click', saveOffer);
+    $('saveSourceBtn').addEventListener('click', saveSource);
+    $('copyCampaignUrlBtn').addEventListener('click', () => {
+      const slug = $('campaignSlug').value.trim();
+      if (!slug) return toast('Slug пока пустой', false);
+      return copyText(publicUrl(slug), 'Go URL скопирован');
+    });
+    $('simulateBtn').addEventListener('click', simulate);
+    $('buildUrlBtn').addEventListener('click', buildTrackingUrl);
+    $('dashboardGroup').addEventListener('change', loadDashboardData);
+    $('reportGroup').addEventListener('change', loadReports);
+    ['campaignSearch', 'campaignStatusFilter'].forEach((id) => $(id).addEventListener('input', renderCampaigns));
+    ['offerSearch', 'offerStatusFilter'].forEach((id) => $(id).addEventListener('input', renderOffers));
+    $('sourceSearch').addEventListener('input', renderSources);
+
+    $('campaignsTable').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-campaign-action]');
+      if (!button) return;
+      const id = Number(button.dataset.id);
+      const action = button.dataset.campaignAction;
+      if (action === 'edit') return openCampaignEditor(id);
+      if (action === 'duplicate') return duplicateCampaign(id);
+      if (action === 'toggle') return toggleCampaign(id, button.dataset.value === 'true');
+      if (action === 'delete') return deleteCampaign(id);
+    });
+
+    $('offersTable').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-offer-action]');
+      if (!button) return;
+      const id = Number(button.dataset.id);
+      if (button.dataset.offerAction === 'edit') return openOfferEditor(id);
+      if (button.dataset.offerAction === 'delete') return deleteOffer(id);
+    });
+
+    $('sourcesTable').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-source-action]');
+      if (!button) return;
+      const id = Number(button.dataset.id);
+      if (button.dataset.sourceAction === 'edit') return openSourceEditor(id);
+      if (button.dataset.sourceAction === 'delete') return deleteSource(id);
+    });
+
+    initStaticSelects();
+    renderPageActions('dashboard');
+    renderAll();
+    refreshAll();
   </script>
 </body>
 </html>
