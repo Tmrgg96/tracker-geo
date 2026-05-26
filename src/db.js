@@ -43,12 +43,21 @@ async function initSchema() {
       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS tds_offers (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      url TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE INDEX IF NOT EXISTS idx_tds_campaigns_slug ON tds_campaigns(slug);
     CREATE INDEX IF NOT EXISTS idx_tds_campaign_links_campaign ON tds_campaign_links(campaign_id);
     CREATE INDEX IF NOT EXISTS idx_tds_campaign_links_lookup ON tds_campaign_links(campaign_id, country_code, device_type);
     CREATE INDEX IF NOT EXISTS idx_tds_clicks_campaign ON tds_clicks(campaign_id);
     CREATE INDEX IF NOT EXISTS idx_tds_clicks_created_at ON tds_clicks(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_tds_clicks_campaign_created_at ON tds_clicks(campaign_id, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_tds_offers_created_at ON tds_offers(created_at DESC);
   `);
 }
 

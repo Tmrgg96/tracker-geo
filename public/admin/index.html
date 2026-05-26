@@ -282,7 +282,8 @@
       display: grid;
       grid-template-columns: minmax(150px, 0.95fr) minmax(0, 1.35fr) 42px;
       grid-template-areas:
-        "country url delete"
+        "country offer delete"
+        "url url delete"
         "device weight delete";
       gap: 8px;
       margin-bottom: 8px;
@@ -294,13 +295,14 @@
     }
 
     .rule-country { grid-area: country; }
+    .rule-offer { grid-area: offer; }
     .rule-url { grid-area: url; }
     .rule-device { grid-area: device; }
     .rule-weight { grid-area: weight; }
     .rule-delete {
       grid-area: delete;
       width: 42px;
-      height: 86px;
+      height: 132px;
     }
 
     .actions {
@@ -390,9 +392,46 @@
 
     .lower-grid {
       display: grid;
-      grid-template-columns: minmax(280px, 0.85fr) minmax(300px, 1.15fr);
+      grid-template-columns: minmax(280px, 0.9fr) minmax(280px, 0.8fr) minmax(300px, 1fr);
       gap: 16px;
       margin-top: 16px;
+    }
+
+    .offer-form {
+      display: grid;
+      grid-template-columns: minmax(130px, 0.75fr) minmax(180px, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .offer-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .offer-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,253,247,0.84);
+    }
+
+    .offer-item strong,
+    .offer-item span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .offer-actions {
+      display: flex;
+      gap: 7px;
     }
 
     .simulate-grid {
@@ -459,6 +498,30 @@
       transform: translateY(0);
     }
 
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(23,21,19,0.46);
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(920px, calc(100vw - 24px));
+      max-height: min(92vh, 980px);
+      overflow: auto;
+      border: 1px solid var(--black);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 8px 8px 0 rgba(32,29,25,0.22);
+    }
+
     .empty {
       padding: 26px 14px;
       border: 1px dashed var(--line);
@@ -504,6 +567,10 @@
         grid-template-columns: 1fr;
       }
 
+      .offer-form {
+        grid-template-columns: 1fr;
+      }
+
       .campaign {
         grid-template-columns: 1fr;
       }
@@ -512,6 +579,7 @@
         grid-template-columns: 1fr 42px;
         grid-template-areas:
           "country delete"
+          "offer offer"
           "url url"
           "device device"
           "weight weight";
@@ -594,7 +662,22 @@
     <section class="lower-grid">
       <div class="panel">
         <div class="panel-head">
-          <h2>Симулятор</h2>
+          <h2>Офферы</h2>
+          <button class="flat" id="resetOfferBtn" title="Очистить оффер"><i data-lucide="file-plus-2"></i>Новый</button>
+        </div>
+        <div class="panel-body">
+          <div class="offer-form">
+            <label>Название<input id="offerName" type="text" placeholder="Leadgen KZ"></label>
+            <label>URL<input id="offerUrl" type="url" placeholder="https://offer.example"></label>
+            <button id="saveOfferBtn"><i data-lucide="save"></i>Сохранить</button>
+          </div>
+          <div id="offers" class="offer-list"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Проверка редиректа</h2>
           <span class="pill">без записи клика</span>
         </div>
         <div class="panel-body">
@@ -609,7 +692,7 @@
             </label>
             <button id="simulateBtn"><i data-lucide="route"></i>Тест</button>
           </div>
-          <div id="simulateResult" class="result-box muted">Выбери кампанию и проверь, куда поведет трафик.</div>
+          <div id="simulateResult" class="result-box muted">Выбери кампанию и проверь итоговый URL.</div>
         </div>
       </div>
 
@@ -625,13 +708,48 @@
     </section>
   </main>
 
+  <div id="editModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+      <div class="panel-head">
+        <h2 id="editTitle">Редактирование кампании</h2>
+        <button class="flat" id="closeEditBtn" title="Закрыть"><i data-lucide="x"></i>Закрыть</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <label>Название<input id="edit_name" type="text" autocomplete="off"></label>
+          <label>Slug<input id="edit_slug" type="text" autocomplete="off"></label>
+          <label class="wide">Default URL<input id="edit_default_url" type="url"></label>
+          <label>Лимит кликов<input id="edit_click_limit" type="number" min="1" placeholder="Без лимита"></label>
+        </div>
+
+        <div class="switches">
+          <label class="switch"><span>Активна</span><input id="edit_is_active" type="checkbox"></label>
+          <label class="switch"><span>Блокировать ботов</span><input id="edit_block_bots" type="checkbox"></label>
+        </div>
+
+        <div class="links-toolbar">
+          <h3 class="section-title">GEO правила</h3>
+          <button class="secondary" id="editAddRuleBtn"><i data-lucide="plus"></i>Правило</button>
+        </div>
+        <div id="editLinks"></div>
+
+        <div class="actions">
+          <button class="secondary" id="cancelEditBtn"><i data-lucide="x"></i>Отмена</button>
+          <button class="success" id="saveEditBtn"><i data-lucide="save"></i>Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
   <script>
     const state = {
       campaigns: [],
+      offers: [],
       selectedId: null,
       editingId: null,
+      editingOfferId: null,
     };
 
     const $ = (id) => document.getElementById(id);
@@ -681,6 +799,18 @@
       return `${location.origin}/go/${slug}`;
     }
 
+    function findOfferByUrl(url) {
+      return state.offers.find((offer) => offer.url === url);
+    }
+
+    function offerOptions(selectedUrl = '') {
+      const matchedOffer = findOfferByUrl(selectedUrl);
+      const base = `<option value="custom" ${matchedOffer ? '' : 'selected'}>Своя ссылка</option>`;
+      return base + state.offers.map((offer) => (
+        `<option value="${offer.id}" data-url="${escapeHtml(offer.url)}" ${matchedOffer?.id === offer.id ? 'selected' : ''}>${escapeHtml(offer.name)}</option>`
+      )).join('');
+    }
+
     const COUNTRY_CODES = [
       '*', 'AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'AO', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AW', 'AX', 'AZ',
       'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BL', 'BM', 'BN', 'BO', 'BQ', 'BR', 'BS', 'BT',
@@ -721,11 +851,19 @@
       )).join('');
     }
 
-    function addRule(link = {}) {
+    function applyOfferToRule(select) {
+      const option = select.selectedOptions[0];
+      const row = select.closest('.rule');
+      if (!row || !option?.dataset.url) return;
+      row.querySelector('.rule-url').value = option.dataset.url;
+    }
+
+    function addRule(link = {}, targetId = 'links') {
       const wrap = document.createElement('div');
       wrap.className = 'rule';
       wrap.innerHTML = `
         <select class="rule-country">${countryOptions(link.country_code)}</select>
+        <select class="rule-offer">${offerOptions(link.url)}</select>
         <input class="rule-url" type="url" placeholder="https://offer.example/path" value="${escapeHtml(link.url || '')}">
         <select class="rule-device">
           ${['all', 'desktop', 'mobile', 'tablet'].map((device) => `<option value="${device}" ${device === (link.device_type || 'all') ? 'selected' : ''}>${device}</option>`).join('')}
@@ -733,13 +871,14 @@
         <input class="rule-weight" type="number" min="1" value="${escapeHtml(link.weight || 100)}">
         <button type="button" class="icon danger rule-delete" title="Удалить правило">${icon('trash-2')}</button>
       `;
+      wrap.querySelector('.rule-offer').addEventListener('change', (event) => applyOfferToRule(event.currentTarget));
       wrap.querySelector('button').addEventListener('click', () => wrap.remove());
-      $('links').appendChild(wrap);
+      $(targetId).appendChild(wrap);
       refreshIcons();
     }
 
-    function collectLinks() {
-      return [...document.querySelectorAll('#links .rule')]
+    function collectLinks(targetId = 'links') {
+      return [...document.querySelectorAll(`#${targetId} .rule`)]
         .map((row) => {
           const country = normalizeCountryValue(row.querySelector('.rule-country').value);
           return {
@@ -749,7 +888,15 @@
             weight: Number(row.querySelector('.rule-weight').value || 100),
           };
         })
-        .filter((link) => link.country_code || link.url);
+        .filter((link) => link.url);
+    }
+
+    function refreshRuleOfferChoices() {
+      document.querySelectorAll('.rule').forEach((row) => {
+        const url = row.querySelector('.rule-url').value.trim();
+        const select = row.querySelector('.rule-offer');
+        select.innerHTML = offerOptions(url);
+      });
     }
 
     function getPayload() {
@@ -767,7 +914,6 @@
     }
 
     function resetForm() {
-      state.editingId = null;
       $('formTitle').textContent = 'Новая мультиссылка';
       $('name').value = '';
       $('slug').value = '';
@@ -783,12 +929,10 @@
     async function saveCampaign() {
       try {
         const payload = getPayload();
-        const path = state.editingId ? `/api/admin/tds/campaigns/${state.editingId}` : '/api/admin/tds/campaigns';
-        const method = state.editingId ? 'PUT' : 'POST';
-        const data = await api(path, { method, body: JSON.stringify(payload) });
+        const data = await api('/api/admin/tds/campaigns', { method: 'POST', body: JSON.stringify(payload) });
         state.selectedId = data.campaign.id;
-        state.editingId = data.campaign.id;
-        toast('Кампания сохранена');
+        toast('Кампания создана');
+        resetForm();
         await loadCampaigns(false);
         await loadStats();
       } catch (error) {
@@ -801,17 +945,62 @@
         const data = await api(`/api/admin/tds/campaigns/${id}`);
         state.selectedId = id;
         state.editingId = id;
-        $('formTitle').textContent = `Редактирование #${id}`;
-        $('name').value = data.campaign.name || '';
-        $('slug').value = data.campaign.slug || '';
-        $('default_url').value = data.campaign.default_url || '';
-        $('click_limit').value = data.campaign.click_limit || '';
-        $('is_active').checked = Boolean(data.campaign.is_active);
-        $('block_bots').checked = Boolean(data.campaign.block_bots);
-        $('links').innerHTML = '';
-        (data.links.length ? data.links : [{ country_code: 'ANY', device_type: 'all', weight: 100 }]).forEach(addRule);
+        $('editTitle').textContent = `Редактирование #${id}`;
+        $('edit_name').value = data.campaign.name || '';
+        $('edit_slug').value = data.campaign.slug || '';
+        $('edit_default_url').value = data.campaign.default_url || '';
+        $('edit_click_limit').value = data.campaign.click_limit || '';
+        $('edit_is_active').checked = Boolean(data.campaign.is_active);
+        $('edit_block_bots').checked = Boolean(data.campaign.block_bots);
+        $('editLinks').innerHTML = '';
+        (data.links.length ? data.links : [{ country_code: 'ANY', device_type: 'all', weight: 100 }]).forEach((link) => addRule(link, 'editLinks'));
         $('selectedLabel').textContent = data.campaign.slug;
         renderCampaigns();
+        openEditModal();
+        await loadStats();
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function openEditModal() {
+      $('editModal').classList.add('open');
+      $('editModal').setAttribute('aria-hidden', 'false');
+      refreshIcons();
+    }
+
+    function closeEditModal() {
+      $('editModal').classList.remove('open');
+      $('editModal').setAttribute('aria-hidden', 'true');
+      state.editingId = null;
+    }
+
+    function getEditPayload() {
+      return {
+        name: $('edit_name').value.trim(),
+        slug: $('edit_slug').value.trim(),
+        default_url: $('edit_default_url').value.trim(),
+        click_limit: $('edit_click_limit').value ? Number($('edit_click_limit').value) : null,
+        start_date: null,
+        end_date: null,
+        is_active: $('edit_is_active').checked,
+        block_bots: $('edit_block_bots').checked,
+        links: collectLinks('editLinks'),
+      };
+    }
+
+    async function saveEditCampaign() {
+      if (!state.editingId) return;
+
+      try {
+        const data = await api(`/api/admin/tds/campaigns/${state.editingId}`, {
+          method: 'PUT',
+          body: JSON.stringify(getEditPayload()),
+        });
+        state.selectedId = data.campaign.id;
+        toast('Кампания обновлена');
+        closeEditModal();
+        await loadCampaigns(false);
         await loadStats();
       } catch (error) {
         toast(error.message, false);
@@ -859,6 +1048,87 @@
       try {
         await api(`/api/admin/tds/campaigns/${id}/status`, { method: 'PATCH', body: JSON.stringify({ is_active: value }) });
         await loadCampaigns(false);
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function resetOfferForm() {
+      state.editingOfferId = null;
+      $('offerName').value = '';
+      $('offerUrl').value = '';
+      $('saveOfferBtn').innerHTML = `${icon('save')}Сохранить`;
+      refreshIcons();
+    }
+
+    async function saveOffer() {
+      try {
+        const payload = {
+          name: $('offerName').value.trim(),
+          url: $('offerUrl').value.trim(),
+        };
+        const path = state.editingOfferId ? `/api/admin/tds/offers/${state.editingOfferId}` : '/api/admin/tds/offers';
+        const method = state.editingOfferId ? 'PUT' : 'POST';
+        await api(path, { method, body: JSON.stringify(payload) });
+        toast(state.editingOfferId ? 'Оффер обновлен' : 'Оффер сохранен');
+        resetOfferForm();
+        await loadOffers();
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function editOffer(id) {
+      const offer = state.offers.find((item) => Number(item.id) === Number(id));
+      if (!offer) return;
+      state.editingOfferId = offer.id;
+      $('offerName').value = offer.name;
+      $('offerUrl').value = offer.url;
+      $('saveOfferBtn').innerHTML = `${icon('save')}Обновить`;
+      refreshIcons();
+    }
+
+    async function deleteOffer(id) {
+      if (!confirm(`Удалить оффер #${id}?`)) return;
+
+      try {
+        await api(`/api/admin/tds/offers/${id}`, { method: 'DELETE' });
+        toast('Оффер удален');
+        if (Number(state.editingOfferId) === Number(id)) resetOfferForm();
+        await loadOffers();
+      } catch (error) {
+        toast(error.message, false);
+      }
+    }
+
+    function renderOffers() {
+      const node = $('offers');
+      if (!state.offers.length) {
+        node.innerHTML = '<div class="empty">Сохраненных офферов пока нет.</div>';
+        return;
+      }
+
+      node.innerHTML = state.offers.map((offer) => `
+        <article class="offer-item">
+          <div>
+            <strong>${escapeHtml(offer.name)}</strong>
+            <span class="mono muted">${escapeHtml(offer.url)}</span>
+          </div>
+          <div class="offer-actions">
+            <button class="icon secondary" title="Редактировать оффер" data-offer-action="edit" data-id="${offer.id}">${icon('square-pen')}</button>
+            <button class="icon danger" title="Удалить оффер" data-offer-action="delete" data-id="${offer.id}">${icon('trash-2')}</button>
+          </div>
+        </article>
+      `).join('');
+      refreshIcons();
+    }
+
+    async function loadOffers() {
+      try {
+        const data = await api('/api/admin/tds/offers');
+        state.offers = data.offers || [];
+        renderOffers();
+        refreshRuleOfferChoices();
       } catch (error) {
         toast(error.message, false);
       }
@@ -987,6 +1257,15 @@
     $('saveBtn').addEventListener('click', saveCampaign);
     $('resetBtn').addEventListener('click', resetForm);
     $('addRuleBtn').addEventListener('click', () => addRule({ country_code: 'ANY', device_type: 'all', weight: 100 }));
+    $('editAddRuleBtn').addEventListener('click', () => addRule({ country_code: 'ANY', device_type: 'all', weight: 100 }, 'editLinks'));
+    $('saveEditBtn').addEventListener('click', saveEditCampaign);
+    $('cancelEditBtn').addEventListener('click', closeEditModal);
+    $('closeEditBtn').addEventListener('click', closeEditModal);
+    $('editModal').addEventListener('click', (event) => {
+      if (event.target.id === 'editModal') closeEditModal();
+    });
+    $('saveOfferBtn').addEventListener('click', saveOffer);
+    $('resetOfferBtn').addEventListener('click', resetOfferForm);
     $('reloadBtn').addEventListener('click', () => loadCampaigns());
     $('refreshBtn').addEventListener('click', () => loadCampaigns());
     $('search').addEventListener('input', renderCampaigns);
@@ -1011,7 +1290,16 @@
       if (action === 'delete') return deleteCampaign(id);
     });
 
+    $('offers').addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-offer-action]');
+      if (!button) return;
+      const id = Number(button.dataset.id);
+      if (button.dataset.offerAction === 'edit') return editOffer(id);
+      if (button.dataset.offerAction === 'delete') return deleteOffer(id);
+    });
+
     resetForm();
+    loadOffers();
     loadCampaigns(false);
     refreshIcons();
   </script>
