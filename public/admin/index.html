@@ -1617,9 +1617,11 @@
 
     function resetDailyFilters() {
       $('dailyCampaign').value = '';
-      const today = todayIso();
-      $('dailyFrom').value = today;
-      $('dailyTo').value = today;
+      const today = new Date();
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      $('dailyFrom').value = weekAgo.toISOString().slice(0, 10);
+      $('dailyTo').value = today.toISOString().slice(0, 10);
       setDailyFiltersDirty(true);
       toast('Фильтры сброшены. Нажми Применить, чтобы обновить статистику.');
     }
