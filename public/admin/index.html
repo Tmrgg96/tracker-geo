@@ -324,6 +324,23 @@
     .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .toolbar input, .toolbar select { max-width: 320px; }
 
+    .daily-filterbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+
+    .daily-filterbar .compact-field {
+      min-width: 150px;
+      max-width: 220px;
+    }
+
+    .daily-filterbar .compact-field.campaign { min-width: 240px; }
+    .daily-filterbar .daily-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
     .table-wrap { width: 100%; overflow: auto; }
 
     table {
@@ -529,6 +546,8 @@
       .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .rule { grid-template-columns: 1fr; }
       .row-actions { justify-content: flex-start; }
+      .daily-filterbar { width: 100%; flex-wrap: wrap; justify-content: flex-start; }
+      .daily-filterbar .compact-field, .daily-filterbar .compact-field.campaign { flex: 1 1 180px; max-width: none; }
       .sidebar-footer { grid-template-columns: 1fr; }
       .panel-body, .panel-head, .topbar, .brand { padding: 12px; }
       table { min-width: 680px; }
@@ -667,11 +686,14 @@
         <div class="panel" style="margin-top:16px;">
           <div class="panel-head">
             <h3>Daily stats</h3>
-            <div class="toolbar-right">
-              <select id="dailyCampaign"></select>
-              <input id="dailyFrom" type="date" aria-label="Дата от">
-              <input id="dailyTo" type="date" aria-label="Дата до">
-              <button class="secondary" id="reloadDailyBtn"><i data-lucide="calendar-days"></i>По дням</button>
+            <div class="daily-filterbar">
+              <label class="compact-field campaign">Кампания<select id="dailyCampaign"></select></label>
+              <label class="compact-field">Дата от<input id="dailyFrom" type="date"></label>
+              <label class="compact-field">Дата до<input id="dailyTo" type="date"></label>
+              <div class="daily-actions">
+                <button class="secondary" id="clearDailyBtn"><i data-lucide="eraser"></i>Очистить</button>
+                <button class="secondary" id="reloadDailyBtn"><i data-lucide="refresh-cw"></i>Обновить</button>
+              </div>
             </div>
           </div>
           <div class="panel-body" id="dailyStats"></div>
@@ -966,6 +988,7 @@
     function fmtPct(value) { return `${number.format(Number(value || 0))}%`; }
     function fmtDate(value) { return value ? new Date(value).toLocaleString('ru-RU') : '-'; }
     function fmtDay(value) { return value ? new Date(`${value}T00:00:00`).toLocaleDateString('ru-RU') : '-'; }
+    function todayIso() { return new Date().toISOString().slice(0, 10); }
 
     function normalizeCountry(value) {
       const code = String(value || '').trim().toUpperCase();
@@ -1591,6 +1614,14 @@
       $('dailyTo').value = today.toISOString().slice(0, 10);
     }
 
+    function resetDailyFilters() {
+      $('dailyCampaign').value = '';
+      const today = todayIso();
+      $('dailyFrom').value = today;
+      $('dailyTo').value = today;
+      toast('Фильтры сброшены. Нажми Обновить, чтобы применить.');
+    }
+
     async function loadCampaigns(showToast = false) {
       const data = await safeApi('campaigns', '/api/admin/tds/campaigns');
       if (data) state.campaigns = data.campaigns || [];
@@ -1746,6 +1777,7 @@
     $('reloadOffersBtn').addEventListener('click', () => loadOffers(true));
     $('reloadSourcesBtn').addEventListener('click', () => loadSources(true));
     $('reloadReportsBtn').addEventListener('click', loadReports);
+    $('clearDailyBtn').addEventListener('click', resetDailyFilters);
     $('reloadDailyBtn').addEventListener('click', () => loadDailyStats(true));
     $('addRuleBtn').addEventListener('click', () => addRule(defaultRule()));
     $('saveCampaignBtn').addEventListener('click', saveCampaign);
@@ -1760,7 +1792,6 @@
     $('buildUrlBtn').addEventListener('click', buildTrackingUrl);
     $('dashboardGroup').addEventListener('change', loadDashboardData);
     $('reportGroup').addEventListener('change', loadReports);
-    ['dailyCampaign', 'dailyFrom', 'dailyTo'].forEach((id) => $(id).addEventListener('change', () => loadDailyStats(false)));
     ['campaignSearch', 'campaignStatusFilter'].forEach((id) => $(id).addEventListener('input', renderCampaigns));
     ['offerSearch', 'offerStatusFilter'].forEach((id) => $(id).addEventListener('input', renderOffers));
     $('sourceSearch').addEventListener('input', renderSources);
