@@ -895,6 +895,7 @@
       dailyRows: [],
       clicks: [],
       conversions: [],
+      dailyFiltersDirty: false,
       selectedCampaignId: null,
       editingCampaignId: null,
       editingOfferId: null,
@@ -1619,7 +1620,16 @@
       const today = todayIso();
       $('dailyFrom').value = today;
       $('dailyTo').value = today;
-      toast('Фильтры сброшены. Нажми Обновить, чтобы применить.');
+      setDailyFiltersDirty(true);
+      toast('Фильтры сброшены. Нажми Применить, чтобы обновить статистику.');
+    }
+
+    function setDailyFiltersDirty(value) {
+      state.dailyFiltersDirty = Boolean(value);
+      $('reloadDailyBtn').innerHTML = state.dailyFiltersDirty
+        ? `${icon('check')}Применить`
+        : `${icon('refresh-cw')}Обновить`;
+      refreshIcons();
     }
 
     async function loadCampaigns(showToast = false) {
@@ -1685,6 +1695,7 @@
       if ($('dailyCampaign')?.value) params.set('campaign_id', $('dailyCampaign').value);
       const data = await safeApi('daily', `/api/admin/tds/reports/daily?${params.toString()}`);
       if (data) state.dailyRows = data.rows || [];
+      if (data) setDailyFiltersDirty(false);
       renderDailyStats();
       renderApiHealth();
       if (showToast && data) toast('Daily stats обновлены');
@@ -1792,6 +1803,7 @@
     $('buildUrlBtn').addEventListener('click', buildTrackingUrl);
     $('dashboardGroup').addEventListener('change', loadDashboardData);
     $('reportGroup').addEventListener('change', loadReports);
+    ['dailyCampaign', 'dailyFrom', 'dailyTo'].forEach((id) => $(id).addEventListener('change', () => setDailyFiltersDirty(true)));
     ['campaignSearch', 'campaignStatusFilter'].forEach((id) => $(id).addEventListener('input', renderCampaigns));
     ['offerSearch', 'offerStatusFilter'].forEach((id) => $(id).addEventListener('input', renderOffers));
     $('sourceSearch').addEventListener('input', renderSources);
