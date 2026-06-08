@@ -893,6 +893,8 @@
       reports: ['Analytics', 'Logs / Reports', 'CR, ROI, revenue, profit, breakdown, recent clicks и conversions.'],
       tools: ['QA', 'Tools', 'Проверка редиректа без записи клика, генератор ссылок и рабочие макросы.'],
     };
+    const TAB_IDS = Object.keys(PAGE_META);
+    const TAB_STORAGE_KEY = 'geoTracker.activeTab';
 
     const FALLBACK_COUNTRY_CODES = [
       'AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'AO', 'AR', 'AS', 'AT', 'AU', 'AZ',
@@ -1011,11 +1013,33 @@
       if (id === 'sourceModal') state.editingSourceId = null;
     }
 
-    function setActiveTab(tab) {
-      state.activeTab = tab;
-      document.querySelectorAll('.nav button').forEach((button) => button.classList.toggle('active', button.dataset.tab === tab));
-      document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${tab}`));
-      const [eyebrow, title, description] = PAGE_META[tab];
+    function getInitialTab() {
+      const hashTab = normalizeTab(location.hash.replace(/^#/, ''));
+      if (hashTab) return hashTab;
+
+      try {
+        return normalizeTab(localStorage.getItem(TAB_STORAGE_KEY)) || 'dashboard';
+      } catch (_error) {
+        return 'dashboard';
+      }
+    }
+
+    function normalizeTab(tab) {
+      return TAB_IDS.includes(tab) ? tab : '';
+    }
+
+    function setActiveTab(tab, options = {}) {
+      const normalized = normalizeTab(tab) || 'dashboard';
+      state.activeTab = normalized;
+      try {
+        localStorage.setItem(TAB_STORAGE_KEY, normalized);
+      } catch (_error) {}
+      if (!options.skipHash && location.hash.replace(/^#/, '') !== normalized) {
+        history.replaceState(null, '', `#${normalized}`);
+      }
+      document.querySelectorAll('.nav button').forEach((button) => button.classList.toggle('active', button.dataset.tab === normalized));
+      document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${normalized}`));
+      const [eyebrow, title, description] = PAGE_META[normalized];
       $('pageEyebrow').textContent = eyebrow;
       $('pageTitle').textContent = title;
       $('pageDescription').textContent = description;
@@ -1709,6 +1733,10 @@
     });
 
     document.querySelectorAll('.nav button').forEach((button) => button.addEventListener('click', () => setActiveTab(button.dataset.tab)));
+    window.addEventListener('hashchange', () => {
+      const tab = normalizeTab(location.hash.replace(/^#/, ''));
+      if (tab) setActiveTab(tab, { skipHash: true });
+    });
 
     $('globalRefreshBtn').addEventListener('click', refreshAll);
     $('newCampaignBtn').addEventListener('click', () => openCampaignEditor());
@@ -1765,6 +1793,7 @@
     });
 
     initStaticSelects();
+    setActiveTab(getInitialTab(), { skipHash: true });
     renderAll();
     refreshAll();
   </script>
