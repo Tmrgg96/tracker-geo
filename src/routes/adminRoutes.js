@@ -734,6 +734,79 @@ function buildAdminRoutes(pool) {
     }
   });
 
+  router.get('/api/admin/tds/reports/daily', adminAuth, async (req, res) => {
+    try {
+      const campaignId = req.query.campaign_id ? Number(req.query.campaign_id) : null;
+      const from = req.query.from || null;
+      const to = req.query.to || null;
+
+      const result = await pool.query(
+        `WITH bounds AS (
+           SELECT
+             COALESCE($1::date, (CURRENT_DATE - INTERVAL '13 days')::date) AS from_date,
+             COALESCE($2::date, CURRENT_DATE::date) AS to_date
+         ),
+         days AS (
+           SELECT generate_series(from_date, to_date, INTERVAL '1 day')::date AS day
+           FROM bounds
+         ),
+         click_daily AS (
+           SELECT clk.created_at::date AS day,
+                  COUNT(*)::int AS clicks,
+                  COUNT(*) FILTER (WHERE clk.is_unique)::int AS unique_clicks,
+                  COUNT(*) FILTER (WHERE clk.is_bot)::int AS bots,
+                  COALESCE(SUM(clk.cost), 0)::float AS cost
+           FROM tds_clicks clk, bounds
+           WHERE clk.created_at::date BETWEEN bounds.from_date AND bounds.to_date
+             AND ($3::int IS NULL OR clk.campaign_id = $3::int)
+           GROUP BY clk.created_at::date
+         ),
+         conversion_daily AS (
+           SELECT cv.created_at::date AS day,
+                  COUNT(*) FILTER (WHERE cv.status <> 'rejected')::int AS conversions,
+                  COALESCE(SUM(cv.payout) FILTER (WHERE cv.status <> 'rejected'), 0)::float AS revenue
+           FROM tds_conversions cv, bounds
+           WHERE cv.created_at::date BETWEEN bounds.from_date AND bounds.to_date
+             AND ($3::int IS NULL OR cv.campaign_id = $3::int)
+           GROUP BY cv.created_at::date
+         )
+         SELECT days.day::text AS day,
+                COALESCE(click_daily.clicks, 0)::int AS clicks,
+                COALESCE(click_daily.unique_clicks, 0)::int AS unique_clicks,
+                COALESCE(click_daily.bots, 0)::int AS bots,
+                COALESCE(conversion_daily.conversions, 0)::int AS conversions,
+                COALESCE(conversion_daily.revenue, 0)::float AS revenue,
+                COALESCE(click_daily.cost, 0)::float AS cost,
+                (COALESCE(conversion_daily.revenue, 0) - COALESCE(click_daily.cost, 0))::float AS profit
+         FROM days
+         LEFT JOIN click_daily ON click_daily.day = days.day
+         LEFT JOIN conversion_daily ON conversion_daily.day = days.day
+         ORDER BY days.day DESC`,
+        [from, to, campaignId]
+      );
+
+      const rows = result.rows.map((row) => {
+        const clicks = Number(row.clicks) || 0;
+        const conversions = Number(row.conversions) || 0;
+        const revenue = Number(row.revenue) || 0;
+        const cost = Number(row.cost) || 0;
+        const profit = revenue - cost;
+        return {
+          ...row,
+          profit,
+          roi: cost ? (profit / cost) * 100 : 0,
+          cr: clicks ? (conversions / clicks) * 100 : 0,
+          epc: clicks ? revenue / clicks : 0,
+        };
+      });
+
+      res.json({ success: true, rows });
+    } catch (error) {
+      console.error('Daily report error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch daily report' });
+    }
+  });
+
   router.get('/api/admin/tds/clicks', adminAuth, async (req, res) => {
     try {
       const values = [];

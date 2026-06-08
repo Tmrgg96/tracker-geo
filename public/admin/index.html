@@ -666,6 +666,18 @@
         <div class="grid kpi" id="reportKpis"></div>
         <div class="panel" style="margin-top:16px;">
           <div class="panel-head">
+            <h3>Daily stats</h3>
+            <div class="toolbar-right">
+              <select id="dailyCampaign"></select>
+              <input id="dailyFrom" type="date" aria-label="Дата от">
+              <input id="dailyTo" type="date" aria-label="Дата до">
+              <button class="secondary" id="reloadDailyBtn"><i data-lucide="calendar-days"></i>По дням</button>
+            </div>
+          </div>
+          <div class="panel-body" id="dailyStats"></div>
+        </div>
+        <div class="panel" style="margin-top:16px;">
+          <div class="panel-head">
             <h3>Breakdown</h3>
             <div class="toolbar-right">
               <select id="reportGroup">
@@ -858,6 +870,7 @@
       summary: null,
       dashboardBreakdown: [],
       reportBreakdown: [],
+      dailyRows: [],
       clicks: [],
       conversions: [],
       selectedCampaignId: null,
@@ -950,6 +963,7 @@
     function fmtMoney(value) { return money.format(Number(value || 0)); }
     function fmtPct(value) { return `${number.format(Number(value || 0))}%`; }
     function fmtDate(value) { return value ? new Date(value).toLocaleString('ru-RU') : '-'; }
+    function fmtDay(value) { return value ? new Date(`${value}T00:00:00`).toLocaleDateString('ru-RU') : '-'; }
 
     function normalizeCountry(value) {
       const code = String(value || '').trim().toUpperCase();
@@ -1073,6 +1087,35 @@
           <td class="mono">${fmtMoney(row.revenue)}</td>
           <td class="mono">${fmtMoney(row.profit)}</td>
           <td class="mono">${fmtPct(row.roi)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+
+    function renderDailyStats() {
+      if (state.endpointErrors.daily) {
+        $('dailyStats').innerHTML = apiState(`Daily endpoint пока недоступен: ${state.endpointErrors.daily}`, true);
+        return;
+      }
+
+      const rows = asArray(state.dailyRows);
+      if (!rows.length) {
+        $('dailyStats').innerHTML = apiState('За выбранный период нет дневных данных.');
+        return;
+      }
+
+      $('dailyStats').innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th>Дата</th><th>Clicks</th><th>Unique</th><th>Conv.</th><th>CR</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>ROI</th><th>EPC</th></tr></thead>
+        <tbody>${rows.map((row) => `<tr>
+          <td><strong>${escapeHtml(fmtDay(row.day))}</strong><div class="mono muted">${escapeHtml(row.day || '')}</div></td>
+          <td class="mono">${Number(row.clicks || 0)}</td>
+          <td class="mono">${Number(row.unique_clicks || 0)}</td>
+          <td class="mono">${Number(row.conversions || 0)}</td>
+          <td class="mono">${fmtPct(row.cr)}</td>
+          <td class="mono">${fmtMoney(row.revenue)}</td>
+          <td class="mono">${fmtMoney(row.cost)}</td>
+          <td class="mono">${fmtMoney(row.profit)}</td>
+          <td class="mono">${fmtPct(row.roi)}</td>
+          <td class="mono">${fmtMoney(row.epc)}</td>
         </tr>`).join('')}</tbody>
       </table></div>`;
     }
@@ -1236,6 +1279,7 @@
       renderDashboardCampaigns();
       renderBreakdown('dashboardBreakdown', state.dashboardBreakdown, 'dashboardBreakdown');
       renderBreakdown('reportBreakdown', state.reportBreakdown, 'reportBreakdown');
+      renderDailyStats();
       renderCampaigns();
       renderOffers();
       renderSources();
@@ -1497,6 +1541,11 @@
       if (!state.selectedCampaignId && state.campaigns[0]) state.selectedCampaignId = state.campaigns[0].id;
       if ($('simCampaign')) $('simCampaign').value = state.selectedCampaignId || state.campaigns[0]?.id || '';
       if ($('builderCampaign')) $('builderCampaign').value = state.selectedCampaignId || state.campaigns[0]?.id || '';
+      if ($('dailyCampaign')) {
+        const current = $('dailyCampaign').value;
+        $('dailyCampaign').innerHTML = '<option value="">Все кампании</option>' + html;
+        if (current) $('dailyCampaign').value = current;
+      }
     }
 
     function syncOfferChoices() {
@@ -1511,6 +1560,11 @@
     function initStaticSelects() {
       $('simCountry').innerHTML = countryOptions('KZ');
       $('offerCountries').innerHTML = COUNTRY_CODES.filter((code) => code !== '*').map((code) => `<option value="${code}">${escapeHtml(countryLabel(code))}</option>`).join('');
+      const today = new Date();
+      const from = new Date(today);
+      from.setDate(today.getDate() - 13);
+      $('dailyFrom').value = from.toISOString().slice(0, 10);
+      $('dailyTo').value = today.toISOString().slice(0, 10);
     }
 
     async function loadCampaigns(showToast = false) {
@@ -1564,8 +1618,21 @@
       renderKpis('dashboardKpis', state.summary);
       renderKpis('reportKpis', state.summary);
       renderBreakdown('reportBreakdown', state.reportBreakdown, 'reportBreakdown');
+      await loadDailyStats(false);
       renderLogs();
       renderApiHealth();
+    }
+
+    async function loadDailyStats(showToast = true) {
+      const params = new URLSearchParams();
+      if ($('dailyFrom')?.value) params.set('from', $('dailyFrom').value);
+      if ($('dailyTo')?.value) params.set('to', $('dailyTo').value);
+      if ($('dailyCampaign')?.value) params.set('campaign_id', $('dailyCampaign').value);
+      const data = await safeApi('daily', `/api/admin/tds/reports/daily?${params.toString()}`);
+      if (data) state.dailyRows = data.rows || [];
+      renderDailyStats();
+      renderApiHealth();
+      if (showToast && data) toast('Daily stats обновлены');
     }
 
     async function refreshAll() {
@@ -1651,6 +1718,7 @@
     $('reloadOffersBtn').addEventListener('click', () => loadOffers(true));
     $('reloadSourcesBtn').addEventListener('click', () => loadSources(true));
     $('reloadReportsBtn').addEventListener('click', loadReports);
+    $('reloadDailyBtn').addEventListener('click', () => loadDailyStats(true));
     $('addRuleBtn').addEventListener('click', () => addRule(defaultRule()));
     $('saveCampaignBtn').addEventListener('click', saveCampaign);
     $('saveOfferBtn').addEventListener('click', saveOffer);
@@ -1664,6 +1732,7 @@
     $('buildUrlBtn').addEventListener('click', buildTrackingUrl);
     $('dashboardGroup').addEventListener('change', loadDashboardData);
     $('reportGroup').addEventListener('change', loadReports);
+    ['dailyCampaign', 'dailyFrom', 'dailyTo'].forEach((id) => $(id).addEventListener('change', () => loadDailyStats(false)));
     ['campaignSearch', 'campaignStatusFilter'].forEach((id) => $(id).addEventListener('input', renderCampaigns));
     ['offerSearch', 'offerStatusFilter'].forEach((id) => $(id).addEventListener('input', renderOffers));
     $('sourceSearch').addEventListener('input', renderSources);
