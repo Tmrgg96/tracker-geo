@@ -46,6 +46,10 @@ function parseNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function parseBoolean(value) {
+  return value === true || value === 'true' || value === '1' || value === 'yes';
+}
+
 function parseNullablePositiveInt(value) {
   if (value === undefined || value === null || value === '') return null;
   return Math.max(Number(value) || 0, 1);
@@ -573,6 +577,7 @@ function buildAdminRoutes(pool) {
       const clicks = await pool.query(
         `SELECT COUNT(*)::int AS total,
                 COUNT(*) FILTER (WHERE is_unique)::int AS unique_clicks,
+                COUNT(DISTINCT ip)::int AS unique_ip,
                 COUNT(*) FILTER (WHERE is_bot)::int AS bots,
                 COALESCE(SUM(cost), 0)::float AS cost
          FROM tds_clicks WHERE campaign_id = $1`,
@@ -612,8 +617,11 @@ function buildAdminRoutes(pool) {
         success: true,
         stats: {
           total,
+          raw_clicks: total,
           last24h: recentResult.rows.filter((row) => Date.now() - new Date(row.created_at).getTime() < 86400000).length,
           unique_clicks: Number(clickRow.unique_clicks) || 0,
+          unique_ip: Number(clickRow.unique_ip) || 0,
+          repeated_clicks: Math.max(total - (Number(clickRow.unique_clicks) || 0), 0),
           bots: Number(clickRow.bots) || 0,
           conversions: conversionCount,
           revenue,
@@ -635,16 +643,19 @@ function buildAdminRoutes(pool) {
 
   router.get('/api/admin/tds/reports/summary', adminAuth, async (req, res) => {
     try {
+      const uniqueOnly = parseBoolean(req.query.unique_only);
       const clickRange = dateRange(req);
       const clickWhere = clickRange.clauses.length ? `WHERE ${clickRange.clauses.join(' AND ')}` : '';
       const convRange = dateRange(req);
       const convWhere = convRange.clauses.length ? `WHERE ${convRange.clauses.join(' AND ')} AND status <> 'rejected'` : "WHERE status <> 'rejected'";
 
       const clickResult = await pool.query(
-        `SELECT COUNT(*)::int AS clicks,
+        `SELECT COUNT(*)::int AS raw_clicks,
                 COUNT(*) FILTER (WHERE is_unique)::int AS unique_clicks,
+                COUNT(DISTINCT ip)::int AS unique_ip,
                 COUNT(*) FILTER (WHERE is_bot)::int AS bots,
-                COALESCE(SUM(cost), 0)::float AS cost
+                COALESCE(SUM(cost), 0)::float AS raw_cost,
+                COALESCE(SUM(cost) FILTER (WHERE is_unique), 0)::float AS unique_cost
          FROM tds_clicks ${clickWhere}`,
         clickRange.values
       );
@@ -654,8 +665,10 @@ function buildAdminRoutes(pool) {
         convRange.values
       );
 
-      const clicks = Number(clickResult.rows[0].clicks) || 0;
-      const cost = Number(clickResult.rows[0].cost) || 0;
+      const rawClicks = Number(clickResult.rows[0].raw_clicks) || 0;
+      const uniqueClicks = Number(clickResult.rows[0].unique_clicks) || 0;
+      const clicks = uniqueOnly ? uniqueClicks : rawClicks;
+      const cost = uniqueOnly ? Number(clickResult.rows[0].unique_cost) || 0 : Number(clickResult.rows[0].raw_cost) || 0;
       const conversions = Number(convResult.rows[0].conversions) || 0;
       const revenue = Number(convResult.rows[0].revenue) || 0;
       const profit = revenue - cost;
@@ -663,8 +676,12 @@ function buildAdminRoutes(pool) {
       res.json({
         success: true,
         summary: {
+          mode: uniqueOnly ? 'unique' : 'raw',
           clicks,
+          raw_clicks: rawClicks,
           unique_clicks: Number(clickResult.rows[0].unique_clicks) || 0,
+          unique_ip: Number(clickResult.rows[0].unique_ip) || 0,
+          repeated_clicks: Math.max(rawClicks - uniqueClicks, 0),
           bots: Number(clickResult.rows[0].bots) || 0,
           conversions,
           revenue,
@@ -683,6 +700,7 @@ function buildAdminRoutes(pool) {
 
   router.get('/api/admin/tds/reports/breakdown', adminAuth, async (req, res) => {
     try {
+      const uniqueOnly = parseBoolean(req.query.unique_only);
       const groups = {
         campaign: { key: 'COALESCE(c.name, \'N/A\')', join: 'LEFT JOIN tds_campaigns c ON c.id = clk.campaign_id' },
         offer: { key: 'COALESCE(o.name, \'N/A\')', join: 'LEFT JOIN tds_offers o ON o.id = clk.offer_id' },
@@ -697,29 +715,42 @@ function buildAdminRoutes(pool) {
       const where = range.clauses.length ? `WHERE ${range.clauses.join(' AND ')}` : '';
       const result = await pool.query(
         `SELECT ${config.key} AS name,
-                COUNT(clk.*)::int AS clicks,
+                COUNT(clk.*)::int AS raw_clicks,
                 COUNT(clk.*) FILTER (WHERE clk.is_unique)::int AS unique_clicks,
-                COALESCE(SUM(clk.cost), 0)::float AS cost,
-                COUNT(cv.*) FILTER (WHERE cv.status <> 'rejected')::int AS conversions,
-                COALESCE(SUM(cv.payout) FILTER (WHERE cv.status <> 'rejected'), 0)::float AS revenue
+                COUNT(DISTINCT clk.ip)::int AS unique_ip,
+                COALESCE(SUM(clk.cost), 0)::float AS raw_cost,
+                COALESCE(SUM(clk.cost) FILTER (WHERE clk.is_unique), 0)::float AS unique_cost,
+                COALESCE(SUM(cv.conversions), 0)::int AS conversions,
+                COALESCE(SUM(cv.revenue), 0)::float AS revenue
          FROM tds_clicks clk
          ${config.join}
-         LEFT JOIN tds_conversions cv ON cv.click_id = clk.click_id
+         LEFT JOIN (
+           SELECT click_id,
+                  COUNT(*) FILTER (WHERE status <> 'rejected')::int AS conversions,
+                  COALESCE(SUM(payout) FILTER (WHERE status <> 'rejected'), 0)::float AS revenue
+           FROM tds_conversions
+           GROUP BY click_id
+         ) cv ON cv.click_id = clk.click_id
          ${where}
          GROUP BY ${config.key}
-         ORDER BY clicks DESC
+         ORDER BY raw_clicks DESC
          LIMIT 100`,
         range.values
       );
 
       const rows = result.rows.map((row) => {
-        const clicks = Number(row.clicks) || 0;
-        const cost = Number(row.cost) || 0;
+        const rawClicks = Number(row.raw_clicks) || 0;
+        const uniqueClicks = Number(row.unique_clicks) || 0;
+        const clicks = uniqueOnly ? uniqueClicks : rawClicks;
+        const cost = uniqueOnly ? Number(row.unique_cost) || 0 : Number(row.raw_cost) || 0;
         const revenue = Number(row.revenue) || 0;
         const conversions = Number(row.conversions) || 0;
         const profit = revenue - cost;
         return {
           ...row,
+          clicks,
+          cost,
+          repeated_clicks: Math.max(rawClicks - uniqueClicks, 0),
           profit,
           roi: cost ? (profit / cost) * 100 : 0,
           cr: clicks ? (conversions / clicks) * 100 : 0,
@@ -727,7 +758,7 @@ function buildAdminRoutes(pool) {
         };
       });
 
-      res.json({ success: true, group: req.query.group || 'campaign', rows });
+      res.json({ success: true, mode: uniqueOnly ? 'unique' : 'raw', group: req.query.group || 'campaign', rows });
     } catch (error) {
       console.error('Breakdown report error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch breakdown' });
@@ -736,6 +767,7 @@ function buildAdminRoutes(pool) {
 
   router.get('/api/admin/tds/reports/daily', adminAuth, async (req, res) => {
     try {
+      const uniqueOnly = parseBoolean(req.query.unique_only);
       const campaignId = req.query.campaign_id ? Number(req.query.campaign_id) : null;
       const from = req.query.from || null;
       const to = req.query.to || null;
@@ -752,10 +784,12 @@ function buildAdminRoutes(pool) {
          ),
          click_daily AS (
            SELECT clk.created_at::date AS day,
-                  COUNT(*)::int AS clicks,
+                  COUNT(*)::int AS raw_clicks,
                   COUNT(*) FILTER (WHERE clk.is_unique)::int AS unique_clicks,
+                  COUNT(DISTINCT clk.ip)::int AS unique_ip,
                   COUNT(*) FILTER (WHERE clk.is_bot)::int AS bots,
-                  COALESCE(SUM(clk.cost), 0)::float AS cost
+                  COALESCE(SUM(clk.cost), 0)::float AS raw_cost,
+                  COALESCE(SUM(clk.cost) FILTER (WHERE clk.is_unique), 0)::float AS unique_cost
            FROM tds_clicks clk, bounds
            WHERE clk.created_at::date BETWEEN bounds.from_date AND bounds.to_date
              AND ($3::int IS NULL OR clk.campaign_id = $3::int)
@@ -771,13 +805,14 @@ function buildAdminRoutes(pool) {
            GROUP BY cv.created_at::date
          )
          SELECT days.day::text AS day,
-                COALESCE(click_daily.clicks, 0)::int AS clicks,
+                COALESCE(click_daily.raw_clicks, 0)::int AS raw_clicks,
                 COALESCE(click_daily.unique_clicks, 0)::int AS unique_clicks,
+                COALESCE(click_daily.unique_ip, 0)::int AS unique_ip,
                 COALESCE(click_daily.bots, 0)::int AS bots,
                 COALESCE(conversion_daily.conversions, 0)::int AS conversions,
                 COALESCE(conversion_daily.revenue, 0)::float AS revenue,
-                COALESCE(click_daily.cost, 0)::float AS cost,
-                (COALESCE(conversion_daily.revenue, 0) - COALESCE(click_daily.cost, 0))::float AS profit
+                COALESCE(click_daily.raw_cost, 0)::float AS raw_cost,
+                COALESCE(click_daily.unique_cost, 0)::float AS unique_cost
          FROM days
          LEFT JOIN click_daily ON click_daily.day = days.day
          LEFT JOIN conversion_daily ON conversion_daily.day = days.day
@@ -786,13 +821,18 @@ function buildAdminRoutes(pool) {
       );
 
       const rows = result.rows.map((row) => {
-        const clicks = Number(row.clicks) || 0;
+        const rawClicks = Number(row.raw_clicks) || 0;
+        const uniqueClicks = Number(row.unique_clicks) || 0;
+        const clicks = uniqueOnly ? uniqueClicks : rawClicks;
         const conversions = Number(row.conversions) || 0;
         const revenue = Number(row.revenue) || 0;
-        const cost = Number(row.cost) || 0;
+        const cost = uniqueOnly ? Number(row.unique_cost) || 0 : Number(row.raw_cost) || 0;
         const profit = revenue - cost;
         return {
           ...row,
+          clicks,
+          cost,
+          repeated_clicks: Math.max(rawClicks - uniqueClicks, 0),
           profit,
           roi: cost ? (profit / cost) * 100 : 0,
           cr: clicks ? (conversions / clicks) * 100 : 0,
@@ -800,7 +840,7 @@ function buildAdminRoutes(pool) {
         };
       });
 
-      res.json({ success: true, rows });
+      res.json({ success: true, mode: uniqueOnly ? 'unique' : 'raw', rows });
     } catch (error) {
       console.error('Daily report error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch daily report' });

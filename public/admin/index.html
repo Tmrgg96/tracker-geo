@@ -242,7 +242,7 @@
     .grid.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .grid.kpi { grid-template-columns: repeat(7, minmax(128px, 1fr)); }
+    .grid.kpi { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
 
     .panel, .stat-card, .metric-card {
       border: 1px solid var(--black);
@@ -340,6 +340,27 @@
 
     .daily-filterbar .compact-field.campaign { min-width: 240px; }
     .daily-filterbar .daily-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .daily-filterbar .compact-switch {
+      min-height: 40px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .daily-filterbar .compact-switch input {
+      width: 18px;
+      min-height: 18px;
+      accent-color: var(--green);
+    }
 
     .table-wrap { width: 100%; overflow: auto; }
 
@@ -690,6 +711,7 @@
               <label class="compact-field campaign">Кампания<select id="dailyCampaign"></select></label>
               <label class="compact-field">Дата от<input id="dailyFrom" type="date"></label>
               <label class="compact-field">Дата до<input id="dailyTo" type="date"></label>
+              <label class="compact-switch"><input id="reportUniqueOnly" type="checkbox">Не считать повторы</label>
               <div class="daily-actions">
                 <button class="secondary" id="clearDailyBtn"><i data-lucide="eraser"></i>Очистить</button>
                 <button class="secondary" id="reloadDailyBtn"><i data-lucide="refresh-cw"></i>Обновить</button>
@@ -1078,8 +1100,11 @@
       const data = summary || {};
       const clicksFallback = state.campaigns.reduce((sum, item) => sum + Number(item.click_count || 0), 0);
       const cards = [
-        ['Clicks', data.clicks ?? clicksFallback, 'green', 'Все переходы'],
-        ['Unique', data.unique_clicks ?? data.unique ?? '-', 'blue', 'Уникальные клики'],
+        ['Clicks', data.clicks ?? clicksFallback, 'green', data.mode === 'unique' ? 'Без повторов IP+UA' : 'Эффективные клики'],
+        ['Raw', data.raw_clicks ?? data.clicks ?? clicksFallback, 'amber', 'Все заходы на трекер'],
+        ['Unique IP+UA', data.unique_clicks ?? data.unique ?? '-', 'blue', 'Уникальные IP + User-Agent'],
+        ['Unique IP', data.unique_ip ?? '-', 'blue', 'Уникальные IP'],
+        ['Repeated', data.repeated_clicks ?? 0, 'red', 'Повторные клики'],
         ['Conv.', data.conversions ?? 0, 'green', 'Все postback события'],
         ['Revenue', fmtMoney(data.revenue), 'amber', 'Доход'],
         ['Profit', fmtMoney(data.profit), Number(data.profit || 0) < 0 ? 'red' : 'green', 'Доход минус cost'],
@@ -1125,11 +1150,14 @@
         return;
       }
       $(targetId).innerHTML = `<div class="table-wrap"><table>
-        <thead><tr><th>Group</th><th>Clicks</th><th>Unique</th><th>Conv.</th><th>CR</th><th>Revenue</th><th>Profit</th><th>ROI</th></tr></thead>
+        <thead><tr><th>Group</th><th>Clicks</th><th>Raw</th><th>Unique IP+UA</th><th>Unique IP</th><th>Repeated</th><th>Conv.</th><th>CR</th><th>Revenue</th><th>Profit</th><th>ROI</th></tr></thead>
         <tbody>${list.map((row) => `<tr>
           <td><strong>${escapeHtml(row.group || row.name || row.key || '-')}</strong></td>
           <td class="mono">${Number(row.clicks || 0)}</td>
+          <td class="mono">${Number(row.raw_clicks ?? row.clicks ?? 0)}</td>
           <td class="mono">${row.unique_clicks ?? row.unique ?? '-'}</td>
+          <td class="mono">${row.unique_ip ?? '-'}</td>
+          <td class="mono">${Number(row.repeated_clicks || 0)}</td>
           <td class="mono">${Number(row.conversions || 0)}</td>
           <td class="mono">${fmtPct(row.cr)}</td>
           <td class="mono">${fmtMoney(row.revenue)}</td>
@@ -1152,11 +1180,14 @@
       }
 
       $('dailyStats').innerHTML = `<div class="table-wrap"><table>
-        <thead><tr><th>Дата</th><th>Clicks</th><th>Unique</th><th>Conv.</th><th>CR</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>ROI</th><th>EPC</th></tr></thead>
+        <thead><tr><th>Дата</th><th>Clicks</th><th>Raw</th><th>Unique IP+UA</th><th>Unique IP</th><th>Repeated</th><th>Conv.</th><th>CR</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>ROI</th><th>EPC</th></tr></thead>
         <tbody>${rows.map((row) => `<tr>
           <td><strong>${escapeHtml(fmtDay(row.day))}</strong><div class="mono muted">${escapeHtml(row.day || '')}</div></td>
           <td class="mono">${Number(row.clicks || 0)}</td>
+          <td class="mono">${Number(row.raw_clicks ?? row.clicks ?? 0)}</td>
           <td class="mono">${Number(row.unique_clicks || 0)}</td>
+          <td class="mono">${Number(row.unique_ip || 0)}</td>
+          <td class="mono">${Number(row.repeated_clicks || 0)}</td>
           <td class="mono">${Number(row.conversions || 0)}</td>
           <td class="mono">${fmtPct(row.cr)}</td>
           <td class="mono">${fmtMoney(row.revenue)}</td>
@@ -1617,6 +1648,7 @@
 
     function resetDailyFilters() {
       $('dailyCampaign').value = '';
+      $('reportUniqueOnly').checked = false;
       const today = new Date();
       const weekAgo = new Date(today);
       weekAgo.setDate(today.getDate() - 7);
@@ -1632,6 +1664,12 @@
         ? `${icon('check')}Применить`
         : `${icon('refresh-cw')}Обновить`;
       refreshIcons();
+    }
+
+    function reportModeQuery() {
+      const params = new URLSearchParams();
+      if ($('reportUniqueOnly')?.checked) params.set('unique_only', 'true');
+      return params;
     }
 
     async function loadCampaigns(showToast = false) {
@@ -1674,9 +1712,13 @@
 
     async function loadReports() {
       const group = $('reportGroup')?.value || 'campaign';
-      const summary = await safeApi('summary', '/api/admin/tds/reports/summary');
+      const reportParams = reportModeQuery();
+      const summaryPath = `/api/admin/tds/reports/summary?${reportParams.toString()}`;
+      const summary = await safeApi('summary', summaryPath);
       if (summary) state.summary = summary.summary || summary.data || summary;
-      const breakdown = await safeApi('reportBreakdown', `/api/admin/tds/reports/breakdown?group=${encodeURIComponent(group)}`);
+      const breakdownParams = reportModeQuery();
+      breakdownParams.set('group', group);
+      const breakdown = await safeApi('reportBreakdown', `/api/admin/tds/reports/breakdown?${breakdownParams.toString()}`);
       if (breakdown) state.reportBreakdown = breakdown.rows || breakdown.breakdown || breakdown.data || [];
       const clicks = await safeApi('clicks', '/api/admin/tds/clicks?limit=50');
       if (clicks) state.clicks = clicks.clicks || clicks.rows || clicks.data || [];
@@ -1691,7 +1733,7 @@
     }
 
     async function loadDailyStats(showToast = true) {
-      const params = new URLSearchParams();
+      const params = reportModeQuery();
       if ($('dailyFrom')?.value) params.set('from', $('dailyFrom').value);
       if ($('dailyTo')?.value) params.set('to', $('dailyTo').value);
       if ($('dailyCampaign')?.value) params.set('campaign_id', $('dailyCampaign').value);
@@ -1791,7 +1833,7 @@
     $('reloadSourcesBtn').addEventListener('click', () => loadSources(true));
     $('reloadReportsBtn').addEventListener('click', loadReports);
     $('clearDailyBtn').addEventListener('click', resetDailyFilters);
-    $('reloadDailyBtn').addEventListener('click', () => loadDailyStats(true));
+    $('reloadDailyBtn').addEventListener('click', loadReports);
     $('addRuleBtn').addEventListener('click', () => addRule(defaultRule()));
     $('saveCampaignBtn').addEventListener('click', saveCampaign);
     $('saveOfferBtn').addEventListener('click', saveOffer);
@@ -1805,7 +1847,7 @@
     $('buildUrlBtn').addEventListener('click', buildTrackingUrl);
     $('dashboardGroup').addEventListener('change', loadDashboardData);
     $('reportGroup').addEventListener('change', loadReports);
-    ['dailyCampaign', 'dailyFrom', 'dailyTo'].forEach((id) => $(id).addEventListener('change', () => setDailyFiltersDirty(true)));
+    ['dailyCampaign', 'dailyFrom', 'dailyTo', 'reportUniqueOnly'].forEach((id) => $(id).addEventListener('change', () => setDailyFiltersDirty(true)));
     ['campaignSearch', 'campaignStatusFilter'].forEach((id) => $(id).addEventListener('input', renderCampaigns));
     ['offerSearch', 'offerStatusFilter'].forEach((id) => $(id).addEventListener('input', renderOffers));
     $('sourceSearch').addEventListener('input', renderSources);
