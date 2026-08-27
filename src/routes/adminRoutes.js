@@ -111,8 +111,8 @@ function parseCampaignPayload(body, options = {}) {
     click_limit: parseNullablePositiveInt(body.click_limit),
     start_date: body.start_date || null,
     end_date: body.end_date || null,
-    block_bots: body.block_bots === undefined ? options.defaultBlockBots ?? true : Boolean(body.block_bots),
-    is_active: body.is_active === undefined ? options.defaultActive ?? true : Boolean(body.is_active),
+    block_bots: body.block_bots === undefined ? options.defaultBlockBots ?? true : parseBoolean(body.block_bots),
+    is_active: body.is_active === undefined ? options.defaultActive ?? true : parseBoolean(body.is_active),
     links: normalizeLinks(body.links || []),
   };
 }
@@ -199,12 +199,12 @@ function dateRange(req, startIndex = 1) {
   const values = [];
   let i = startIndex;
   if (req.query.from) {
-    clauses.push(`created_at >= $${i}`);
+    clauses.push(`created_at >= $${i}::date`);
     values.push(req.query.from);
     i += 1;
   }
   if (req.query.to) {
-    clauses.push(`created_at <= $${i}`);
+    clauses.push(`created_at < ($${i}::date + INTERVAL '1 day')`);
     values.push(req.query.to);
     i += 1;
   }
@@ -216,12 +216,12 @@ function scopedDateRange(alias, req, startIndex = 1) {
   const values = [];
   let i = startIndex;
   if (req.query.from) {
-    clauses.push(`${alias}.created_at >= $${i}`);
+    clauses.push(`${alias}.created_at >= $${i}::date`);
     values.push(req.query.from);
     i += 1;
   }
   if (req.query.to) {
-    clauses.push(`${alias}.created_at <= $${i}`);
+    clauses.push(`${alias}.created_at < ($${i}::date + INTERVAL '1 day')`);
     values.push(req.query.to);
     i += 1;
   }
@@ -475,7 +475,7 @@ function buildAdminRoutes(pool) {
     try {
       const result = await pool.query(
         `UPDATE tds_campaigns SET is_active = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
-        [Boolean(req.body.is_active), req.params.id]
+        [parseBoolean(req.body.is_active), req.params.id]
       );
       if (!result.rows.length) return res.status(404).json({ success: false, error: 'Campaign not found' });
       return res.json({ success: true, campaign: result.rows[0] });
@@ -775,7 +775,7 @@ function buildAdminRoutes(pool) {
       const result = await pool.query(
         `WITH bounds AS (
            SELECT
-             COALESCE($1::date, (CURRENT_DATE - INTERVAL '13 days')::date) AS from_date,
+             COALESCE($1::date, (CURRENT_DATE - INTERVAL '7 days')::date) AS from_date,
              COALESCE($2::date, CURRENT_DATE::date) AS to_date
          ),
          days AS (
@@ -791,7 +791,8 @@ function buildAdminRoutes(pool) {
                   COALESCE(SUM(clk.cost), 0)::float AS raw_cost,
                   COALESCE(SUM(clk.cost) FILTER (WHERE clk.is_unique), 0)::float AS unique_cost
            FROM tds_clicks clk, bounds
-           WHERE clk.created_at::date BETWEEN bounds.from_date AND bounds.to_date
+           WHERE clk.created_at >= bounds.from_date
+             AND clk.created_at < (bounds.to_date + INTERVAL '1 day')
              AND ($3::int IS NULL OR clk.campaign_id = $3::int)
            GROUP BY clk.created_at::date
          ),
@@ -800,7 +801,8 @@ function buildAdminRoutes(pool) {
                   COUNT(*) FILTER (WHERE cv.status <> 'rejected')::int AS conversions,
                   COALESCE(SUM(cv.payout) FILTER (WHERE cv.status <> 'rejected'), 0)::float AS revenue
            FROM tds_conversions cv, bounds
-           WHERE cv.created_at::date BETWEEN bounds.from_date AND bounds.to_date
+           WHERE cv.created_at >= bounds.from_date
+             AND cv.created_at < (bounds.to_date + INTERVAL '1 day')
              AND ($3::int IS NULL OR cv.campaign_id = $3::int)
            GROUP BY cv.created_at::date
          )

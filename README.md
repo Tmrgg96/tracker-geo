@@ -23,7 +23,7 @@ docker compose up -d --build
 - Админка: `http://localhost:8080/admin`
 - Health: `http://localhost:8080/health`
 
-Токен по умолчанию в `docker-compose.yml`: `change-me-strong-token`.
+Локальные данные Basic Auth по умолчанию в `docker-compose.yml`: `admin` / `change-me-strong-password`.
 
 ## Конфиг
 
@@ -31,7 +31,9 @@ docker compose up -d --build
 
 - `PORT`
 - `DATABASE_URL`
-- `ADMIN_TOKEN`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+- `TRUST_PROXY_HOPS=1` (один reverse proxy перед приложением)
 - `PGSSL=true` (если внешний Postgres с SSL)
 
 ## Deploy в Coolify
@@ -42,7 +44,9 @@ docker compose up -d --build
 2. Build Pack: `Dockerfile`.
 3. Добавь env vars:
    - `PORT=8080`
-   - `ADMIN_TOKEN=<сильный_токен>`
+   - `ADMIN_USERNAME=<логин>`
+   - `ADMIN_PASSWORD=<сильный_пароль>`
+   - `TRUST_PROXY_HOPS=1`
    - `DATABASE_URL=<url_от_postgres_в_coolify>`
    - `PGSSL=true` (если требуется)
 4. Порт приложения: `8080`.
@@ -52,9 +56,9 @@ docker compose up -d --build
 
 ## API (admin)
 
-Все admin endpoints требуют header:
+Все admin endpoints и `/admin` защищены HTTP Basic Auth. Браузер запросит логин и пароль при открытии админки.
 
-`Authorization: Bearer <ADMIN_TOKEN>`
+`Authorization: Basic <base64(username:password)>`
 
 - `GET /api/admin/me`
 - `GET /api/admin/tds/campaigns`
@@ -69,7 +73,7 @@ docker compose up -d --build
 ```bash
 curl -X POST http://localhost:8080/api/admin/tds/campaigns \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer change-me-strong-token" \
+  -u "admin:change-me-strong-password" \
   -d '{
     "name": "Main campaign",
     "slug": "main-geo",

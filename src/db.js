@@ -3,6 +3,10 @@ const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
+  max: Number(process.env.PGPOOL_MAX || 10),
+  connectionTimeoutMillis: Number(process.env.PG_CONNECTION_TIMEOUT_MS || 3000),
+  idleTimeoutMillis: Number(process.env.PG_IDLE_TIMEOUT_MS || 30000),
+  statement_timeout: Number(process.env.PG_STATEMENT_TIMEOUT_MS || 10000),
 });
 
 async function addColumnIfMissing(table, column, definition) {

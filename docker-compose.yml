@@ -8,7 +8,9 @@ services:
       PORT: 8080
       NODE_ENV: production
       DATABASE_URL: postgresql://tracker:tracker@postgres:5432/tracker
-      ADMIN_TOKEN: change-me-strong-token
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: change-me-strong-password
+      TRUST_PROXY_HOPS: 1
     depends_on:
       - postgres
 

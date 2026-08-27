@@ -8,9 +8,8 @@ const { selectRedirectUrl } = require('../utils/redirectSelector');
 const { applyRedirectMacros, scalar } = require('../utils/urlMacros');
 
 function getClientIp(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  const raw = (Array.isArray(forwarded) ? forwarded[0] : forwarded || '').split(',')[0]?.trim() || req.ip || '';
-  return raw.replace(/^::ffff:/, '');
+  const raw = String(req.ip || req.socket?.remoteAddress || '').trim();
+  return raw.replace(/^::ffff:/, '').replace(/^\[|\]$/g, '');
 }
 
 function pickParam(params, names, fallback = null) {
@@ -285,8 +284,14 @@ async function upsertConversion(pool, payload, click) {
 function buildPublicRoutes(pool) {
   const router = express.Router();
 
-  router.get('/health', (_req, res) => {
-    res.json({ success: true, service: 'geo-tds-tracker' });
+  router.get('/health', async (_req, res) => {
+    try {
+      await pool.query('SELECT 1');
+      return res.json({ success: true, service: 'geo-tds-tracker', database: 'ok' });
+    } catch (error) {
+      console.error('Health check error:', error);
+      return res.status(503).json({ success: false, service: 'geo-tds-tracker', database: 'unavailable' });
+    }
   });
 
   router.all('/postback', async (req, res) => {
@@ -379,27 +384,30 @@ function buildPublicRoutes(pool) {
         device: deviceType,
       });
 
-      recordClick(pool, {
-        ...tracking,
-        campaign_id: campaign.id,
-        click_id: clickId,
-        offer_id: offerId,
-        country_code: countryCode,
-        ip: normalizedIp,
-        user_agent: ua,
-        device_type: deviceType,
-        is_bot: detectedBot,
-        redirect_url: redirectUrl,
-        referrer,
-        browser,
-        os,
-        language: extractLanguage(req),
-        city: geo?.city || null,
-        region: geo?.region || null,
-        is_unique: uniqueClick,
-      }).catch((error) => {
+      try {
+        await recordClick(pool, {
+          ...tracking,
+          campaign_id: campaign.id,
+          click_id: clickId,
+          offer_id: offerId,
+          country_code: countryCode,
+          ip: normalizedIp,
+          user_agent: ua,
+          device_type: deviceType,
+          is_bot: detectedBot,
+          redirect_url: redirectUrl,
+          referrer,
+          browser,
+          os,
+          language: extractLanguage(req),
+          city: geo?.city || null,
+          region: geo?.region || null,
+          is_unique: uniqueClick,
+        });
+      } catch (error) {
+        // Redirecting the visitor remains the priority if analytics storage is temporarily unavailable.
         console.error('Click insert error:', error);
-      });
+      }
 
       return res.redirect(302, redirectUrl);
     } catch (error) {
@@ -411,4 +419,4 @@ function buildPublicRoutes(pool) {
   return router;
 }
 
-module.exports = { buildPublicRoutes };
+module.exports = { buildPublicRoutes, getClientIp };
