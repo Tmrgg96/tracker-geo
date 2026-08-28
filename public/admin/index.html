@@ -1,33 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Geo TDS Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=Onest:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.35.0"></script>
   <style>
     :root {
-      --ink: #171513;
-      --muted: #716b60;
-      --paper: #f6f0e4;
-      --panel: #fffaf0;
-      --panel-strong: #fff4d7;
-      --line: #ded1be;
-      --black: #201d19;
-      --green: #0d7d61;
-      --green-soft: rgba(13, 125, 97, 0.12);
-      --red: #ba3a2f;
-      --red-soft: rgba(186, 58, 47, 0.11);
-      --blue: #2869a8;
-      --blue-soft: rgba(40, 105, 168, 0.12);
-      --amber: #bd771d;
-      --amber-soft: rgba(189, 119, 29, 0.14);
-      --shadow: 0 24px 70px rgba(45, 38, 29, 0.12);
-      --hard-shadow: 5px 5px 0 rgba(32, 29, 25, 0.15);
-      --radius: 10px;
+      --ink: #14211f;
+      --ink-strong: #091411;
+      --muted: #62716d;
+      --muted-strong: #45544f;
+      --canvas: #edf2ee;
+      --canvas-deep: #e4ebe6;
+      --panel: #fbfdfb;
+      --panel-strong: #ffffff;
+      --panel-tint: #f2f7f3;
+      --line: #d7e0da;
+      --line-strong: #bdcbc2;
+      --black: #0d1916;
+      --sidebar: #0b1714;
+      --sidebar-soft: #13231e;
+      --sidebar-line: rgba(222, 244, 233, 0.12);
+      --green: #0c8f69;
+      --green-bright: #22b887;
+      --green-soft: #e0f5ec;
+      --lime: #d8f36d;
+      --red: #c1453b;
+      --red-soft: #fbe8e6;
+      --blue: #2567b2;
+      --blue-soft: #e8f1fb;
+      --amber: #a96511;
+      --amber-soft: #fff2d9;
+      --shadow-xs: 0 1px 2px rgba(13, 25, 22, 0.05);
+      --shadow-sm: 0 8px 24px rgba(13, 25, 22, 0.06);
+      --shadow-md: 0 24px 64px rgba(7, 20, 16, 0.16);
+      --radius-sm: 8px;
+      --radius: 14px;
+      --radius-lg: 20px;
+      --sidebar-width: 252px;
+      --focus: 0 0 0 3px rgba(34, 184, 135, 0.28);
+      --z-sticky: 10;
+      --z-sidebar: 30;
+      --z-modal: 50;
+      --z-toast: 70;
     }
 
     * { box-sizing: border-box; }
@@ -36,360 +55,547 @@
 
     body {
       margin: 0;
+      min-width: 320px;
       min-height: 100vh;
       color: var(--ink);
-      font-family: "Archivo", "IBM Plex Sans", sans-serif;
+      font-family: "Onest", "IBM Plex Sans", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
       background:
-        linear-gradient(90deg, rgba(32, 29, 25, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
-        linear-gradient(0deg, rgba(32, 29, 25, 0.03) 1px, transparent 1px) 0 0 / 24px 24px,
-        radial-gradient(circle at 14% 7%, rgba(13, 125, 97, 0.16), transparent 28%),
-        radial-gradient(circle at 92% 8%, rgba(189, 119, 29, 0.16), transparent 30%),
-        linear-gradient(135deg, rgba(255, 250, 240, 0.78), rgba(247, 238, 221, 0.82)),
-        var(--paper);
+        radial-gradient(circle at 78% -12%, rgba(34, 184, 135, 0.10), transparent 34rem),
+        linear-gradient(rgba(13, 25, 22, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(13, 25, 22, 0.028) 1px, transparent 1px),
+        var(--canvas);
+      background-size: auto, 32px 32px, 32px 32px, auto;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
+
+    body.modal-open { overflow: hidden; }
+
+    ::selection { color: var(--ink-strong); background: var(--lime); }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 10px 14px;
+      color: var(--ink-strong);
+      background: var(--lime);
+      border-radius: 10px;
+      font-weight: 800;
+      transform: translateY(-160%);
+      transition: transform 180ms ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
 
     button, input, select, textarea { font: inherit; }
 
     button {
-      min-height: 38px;
+      min-height: 44px;
       border: 1px solid var(--black);
-      border-radius: 8px;
-      padding: 0 13px;
+      border-radius: 11px;
+      padding: 0 15px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      color: var(--panel);
+      color: #f7fbf8;
       background: var(--black);
       cursor: pointer;
-      font-weight: 800;
-      box-shadow: var(--hard-shadow);
-      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+      font-weight: 750;
+      letter-spacing: -0.01em;
+      box-shadow: var(--shadow-xs);
+      transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
       white-space: nowrap;
     }
 
-    button:hover { transform: translate(-1px, -1px); box-shadow: 7px 7px 0 rgba(32, 29, 25, 0.14); }
-    button:disabled { opacity: 0.55; pointer-events: none; }
-    button.icon { width: 38px; padding: 0; }
-    button.secondary { color: var(--ink); background: #fffdf7; }
-    button.success { background: var(--green); border-color: #075643; }
-    button.danger { background: var(--red); border-color: #81231d; }
-    button.flat { color: var(--ink); background: transparent; border-color: var(--line); box-shadow: none; }
-    button.ghost { color: var(--ink); background: var(--panel); box-shadow: none; }
+    button:hover {
+      color: #fff;
+      background: #172823;
+      border-color: #172823;
+      box-shadow: 0 7px 18px rgba(13, 25, 22, 0.12);
+    }
 
-    input, select, textarea {
-      width: 100%;
-      min-height: 40px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 9px 10px;
+    button:active { box-shadow: none; }
+    button:disabled { opacity: 0.52; pointer-events: none; }
+    button svg { width: 17px; height: 17px; stroke-width: 2; flex: 0 0 auto; }
+    button.icon { width: 40px; min-height: 40px; padding: 0; border-radius: 10px; }
+
+    button.secondary {
       color: var(--ink);
-      background: #fffdf7;
-      outline: none;
+      background: var(--panel-strong);
+      border-color: var(--line-strong);
+      box-shadow: none;
     }
 
-    textarea { min-height: 96px; resize: vertical; line-height: 1.35; }
-    input:focus, select:focus, textarea:focus { border-color: var(--black); box-shadow: 0 0 0 3px rgba(13, 125, 97, 0.13); }
+    button.secondary:hover { color: var(--ink-strong); background: var(--panel-tint); border-color: #9fb0a5; }
+    button.success { color: #fff; background: var(--green); border-color: var(--green); }
+    button.success:hover { background: #087a59; border-color: #087a59; }
 
-    label {
-      display: grid;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
+    button.danger {
+      color: var(--red);
+      background: var(--red-soft);
+      border-color: #efc2bd;
+      box-shadow: none;
     }
 
-    a { color: var(--blue); }
+    button.danger:hover { color: #fff; background: var(--red); border-color: var(--red); }
 
-    .app-shell {
-      width: min(1540px, calc(100vw - 24px));
-      margin: 14px auto 32px;
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 14px;
-      min-height: calc(100vh - 28px);
-      border: 1px solid var(--black);
-      border-radius: var(--radius);
-      background: rgba(255, 250, 240, 0.94);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .brand {
-      padding: 18px;
-      border-bottom: 1px solid var(--black);
-      background:
-        radial-gradient(circle at 88% 16%, rgba(13, 125, 97, 0.18), transparent 42%),
-        linear-gradient(145deg, rgba(255, 244, 215, 0.95), rgba(255, 250, 240, 0.95));
-    }
-
-    .brand-mark {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 12px;
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--black);
-      border-radius: 10px;
-      color: var(--panel);
-      background: var(--black);
-      box-shadow: var(--hard-shadow);
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 34px;
-      line-height: 0.88;
-      letter-spacing: -0.04em;
-      text-transform: uppercase;
-    }
-
-    .brand p {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .nav {
-      display: grid;
-      gap: 7px;
-      padding: 12px;
-    }
-
-    .nav button {
-      min-height: 46px;
-      justify-content: flex-start;
-      color: var(--ink);
+    button.flat {
+      color: var(--muted-strong);
       background: transparent;
       border-color: transparent;
       box-shadow: none;
     }
 
-    .nav button.active {
-      border-color: var(--black);
-      background: var(--panel-strong);
-      box-shadow: 3px 3px 0 rgba(32, 29, 25, 0.12);
+    button.flat:hover { color: var(--ink-strong); background: rgba(13, 25, 22, 0.055); border-color: transparent; box-shadow: none; }
+    button.ghost { color: var(--ink); background: var(--panel); border-color: var(--line); box-shadow: none; }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+      border-color: var(--green-bright);
     }
 
+    input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--ink-strong);
+      background: var(--panel-strong);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(13, 25, 22, 0.02);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    }
+
+    input::placeholder, textarea::placeholder { color: #94a19c; }
+    input:hover, select:hover, textarea:hover { border-color: #9fb0a5; }
+    textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
+    select[multiple] { min-height: 190px; padding: 6px; }
+    select[multiple] option { padding: 7px 9px; border-radius: 6px; }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted-strong);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+    }
+
+    a { color: var(--blue); text-underline-offset: 3px; }
+    a:hover { color: #164f8e; }
+
+    .app-shell {
+      width: 100%;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sidebar);
+      height: 100vh;
+      min-height: 620px;
+      display: flex;
+      flex-direction: column;
+      color: #eaf4ef;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(216, 243, 109, 0.10), transparent 17rem),
+        linear-gradient(180deg, var(--sidebar-soft), var(--sidebar));
+      border-right: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+    }
+
+    .sidebar::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      bottom: -80px;
+      width: 210px;
+      height: 210px;
+      border: 1px solid rgba(216, 243, 109, 0.09);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .brand {
+      min-height: 184px;
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--sidebar-line);
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 18px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(216, 243, 109, 0.42);
+      border-radius: 13px 13px 13px 5px;
+      color: var(--ink-strong);
+      background: var(--lime);
+      box-shadow: 0 12px 28px rgba(216, 243, 109, 0.10);
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: -2px;
+      width: 9px;
+      height: 9px;
+      border: 2px solid var(--sidebar-soft);
+      border-radius: 50%;
+      background: var(--green-bright);
+    }
+
+    .brand-mark svg { width: 22px; height: 22px; stroke-width: 2.3; }
+
+    .brand h1 {
+      margin: 0;
+      color: #f7fbf8;
+      font-size: 24px;
+      font-weight: 750;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    .brand p {
+      margin: 12px 0 0;
+      color: #91a59d;
+      font-size: 12px;
+      line-height: 1.48;
+    }
+
+    .nav {
+      display: grid;
+      gap: 4px;
+      padding: 16px 12px;
+    }
+
+    .nav button {
+      min-height: 44px;
+      padding: 0 12px;
+      justify-content: flex-start;
+      color: #9db0a8;
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      font-weight: 600;
+    }
+
+    .nav button:hover { color: #fff; background: rgba(255, 255, 255, 0.06); border-color: transparent; box-shadow: none; }
+
+    .nav button.active {
+      color: var(--ink-strong);
+      background: var(--lime);
+      border-color: var(--lime);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+    }
+
+    .nav button.active svg { stroke-width: 2.5; }
+
     .sidebar-footer {
-      padding: 12px;
-      border-top: 1px solid var(--line);
+      margin-top: auto;
+      padding: 14px 12px 18px;
+      border-top: 1px solid var(--sidebar-line);
       display: grid;
       gap: 10px;
     }
 
-    .content { min-width: 0; }
+    .sidebar-footer button.secondary {
+      color: #e8f2ed;
+      background: rgba(255, 255, 255, 0.055);
+      border-color: rgba(255, 255, 255, 0.11);
+    }
+
+    .sidebar-footer button.secondary:hover { color: #fff; background: rgba(255, 255, 255, 0.10); border-color: rgba(255, 255, 255, 0.18); }
+    .sidebar-footer .pill { width: 100%; justify-content: center; color: #aee6d2; border-color: rgba(34, 184, 135, 0.24); background: rgba(34, 184, 135, 0.10); }
+
+    .content {
+      min-width: 0;
+      width: 100%;
+      max-width: 1660px;
+      margin: 0 auto;
+      padding: 26px clamp(18px, 2.7vw, 44px) 56px;
+    }
 
     .topbar {
-      min-height: 112px;
-      margin-bottom: 16px;
-      padding: 18px;
+      min-height: 116px;
+      margin-bottom: 18px;
+      padding: 10px 0 20px;
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
-      align-items: center;
-      border: 1px solid var(--black);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(100deg, rgba(32, 29, 25, 0.05), transparent 38%),
-        rgba(255, 250, 240, 0.93);
-      box-shadow: var(--shadow);
+      gap: 18px;
+      align-items: end;
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    .topbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 86px;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--green-bright);
     }
 
     .eyebrow {
-      margin: 0 0 8px;
-      font: 700 11px/1 "IBM Plex Mono", monospace;
+      margin: 0 0 7px;
       color: var(--green);
-      letter-spacing: 0.06em;
+      font: 650 10px/1 "IBM Plex Mono", monospace;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .topbar h2 {
       margin: 0;
-      font-size: clamp(28px, 4vw, 54px);
-      line-height: 0.92;
-      letter-spacing: -0.045em;
-      text-transform: uppercase;
+      color: var(--ink-strong);
+      font-size: clamp(29px, 3vw, 44px);
+      font-weight: 760;
+      line-height: 1;
+      letter-spacing: -0.05em;
     }
 
     .topbar p {
       margin: 10px 0 0;
-      max-width: 840px;
+      max-width: 780px;
       color: var(--muted);
-      line-height: 1.42;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .top-actions { display: flex; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
 
-    .tab-panel { display: none; animation: rise 220ms ease both; }
+    .tab-panel { display: none; animation: reveal 260ms cubic-bezier(.2, .8, .2, 1) both; }
     .tab-panel.active { display: block; }
 
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(8px); }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(7px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .grid { display: grid; gap: 16px; }
-    .grid.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .grid { display: grid; gap: 14px; }
+    .grid.two { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
     .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .grid.kpi { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
+    .grid.kpi { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 
     .panel, .stat-card, .metric-card {
-      border: 1px solid var(--black);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 250, 240, 0.94);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+      background: rgba(251, 253, 251, 0.95);
+      box-shadow: var(--shadow-xs);
     }
 
+    .panel { overflow: hidden; }
+    .panel:hover { border-color: #c8d4cc; }
+
     .panel-head {
-      min-height: 58px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--black);
+      min-height: 62px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      background: rgba(32, 29, 25, 0.04);
+      background: rgba(247, 250, 247, 0.84);
     }
 
     .panel-head h3 {
       margin: 0;
-      font-size: 15px;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
+      color: var(--ink-strong);
+      font-size: 13px;
+      font-weight: 780;
+      letter-spacing: -0.015em;
     }
 
+    .panel-head > .toolbar-right select { min-width: 150px; }
     .panel-body { padding: 16px; }
 
     .stat-card {
-      min-height: 118px;
-      padding: 14px;
+      --metric-color: var(--green);
+      min-height: 112px;
+      padding: 16px;
       position: relative;
       overflow: hidden;
+      box-shadow: none;
+      transition: border-color 180ms ease, background-color 180ms ease;
     }
 
-    .stat-card::after {
+    .stat-card::before {
       content: "";
       position: absolute;
-      right: -26px;
-      top: -42px;
-      width: 108px;
-      height: 108px;
-      border: 1px solid rgba(32, 29, 25, 0.12);
-      border-radius: 999px;
-      background: var(--amber-soft);
+      left: 0;
+      top: 14px;
+      bottom: 14px;
+      width: 3px;
+      border-radius: 0 4px 4px 0;
+      background: var(--metric-color);
     }
 
-    .stat-card.green::after { background: var(--green-soft); }
-    .stat-card.blue::after { background: var(--blue-soft); }
-    .stat-card.red::after { background: var(--red-soft); }
+    .stat-card.green { --metric-color: var(--green); }
+    .stat-card.blue { --metric-color: var(--blue); }
+    .stat-card.red { --metric-color: var(--red); }
+    .stat-card.amber { --metric-color: var(--amber); }
+    .stat-card:hover { border-color: var(--line-strong); background: var(--panel-strong); }
+
+    .stat-card:first-child {
+      color: #f6fbf8;
+      background: var(--black);
+      border-color: var(--black);
+    }
+
+    .stat-card:first-child::before { background: var(--lime); }
+    .stat-card:first-child span, .stat-card:first-child small { color: #9eb1a9; }
 
     .stat-card span {
       display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
+      color: var(--muted-strong);
+      font-size: 10px;
+      font-weight: 760;
+      letter-spacing: 0.055em;
       text-transform: uppercase;
     }
 
     .stat-card strong {
       display: block;
-      margin-top: 12px;
-      font: 700 32px/1 "IBM Plex Mono", monospace;
-      letter-spacing: -0.05em;
+      margin-top: 10px;
+      font: 650 27px/1 "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.055em;
     }
 
-    .stat-card small { display: block; margin-top: 8px; color: var(--muted); }
+    .stat-card small {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
 
     .toolbar {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
     }
 
     .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .toolbar input, .toolbar select { max-width: 320px; }
+    .toolbar input, .toolbar select { min-width: 180px; max-width: 320px; }
 
     .daily-filterbar {
       display: flex;
       align-items: flex-end;
       justify-content: flex-end;
       gap: 8px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       min-width: 0;
     }
 
-    .daily-filterbar .compact-field {
-      min-width: 150px;
-      max-width: 220px;
-    }
-
-    .daily-filterbar .compact-field.campaign { min-width: 240px; }
+    .daily-filterbar .compact-field { min-width: 142px; max-width: 190px; }
+    .daily-filterbar .compact-field.campaign { min-width: 230px; max-width: 280px; }
     .daily-filterbar .daily-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
     .daily-filterbar .compact-switch {
-      min-height: 40px;
-      padding: 8px 10px;
+      min-height: 44px;
+      padding: 8px 11px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fffdf7;
-      color: var(--ink);
+      gap: 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-strong);
+      color: var(--muted-strong);
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 680;
+      letter-spacing: 0;
       text-transform: none;
       white-space: nowrap;
     }
 
     .daily-filterbar .compact-switch input {
-      width: 18px;
-      min-height: 18px;
+      width: 17px;
+      min-height: 17px;
+      margin: 0;
       accent-color: var(--green);
     }
 
-    .table-wrap { width: 100%; overflow: auto; }
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-strong);
+      scrollbar-color: #aebdb4 transparent;
+      scrollbar-width: thin;
+    }
+
+    .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+    .table-wrap::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 8px; background: #aebdb4; background-clip: padding-box; }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       min-width: 760px;
-      font-size: 13px;
+      color: var(--ink);
+      font-size: 12px;
     }
 
     th, td {
-      padding: 10px 9px;
+      padding: 11px 12px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: middle;
     }
 
     th {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sticky);
       color: var(--muted);
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 800;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.085em;
       text-transform: uppercase;
-      background: rgba(255, 253, 247, 0.62);
+      background: #f3f7f4;
+      box-shadow: inset 0 -1px 0 var(--line);
+      white-space: nowrap;
     }
 
-    tr:hover td { background: rgba(32, 29, 25, 0.025); }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr { transition: background-color 140ms ease; }
+    tbody tr:hover td { background: #f5faf6; }
+    td strong { color: var(--ink-strong); font-weight: 700; }
 
-    .mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+    .mono {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
     .muted { color: var(--muted); }
     .nowrap { white-space: nowrap; }
     .truncate { max-width: 330px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -399,138 +605,198 @@
     .pill {
       width: max-content;
       max-width: 100%;
+      min-height: 25px;
       padding: 5px 8px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--line-strong);
       border-radius: 999px;
-      background: #fffdf7;
-      font: 700 11px/1 "IBM Plex Mono", monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted-strong);
+      background: #f7faf8;
+      font: 650 9px/1 "IBM Plex Mono", monospace;
+      letter-spacing: 0.055em;
       text-transform: uppercase;
       white-space: nowrap;
     }
 
-    .pill.on { color: #075643; border-color: rgba(13, 125, 97, 0.35); background: var(--green-soft); }
-    .pill.off { color: #81231d; border-color: rgba(186, 58, 47, 0.28); background: var(--red-soft); }
-    .pill.info { color: #174b7c; border-color: rgba(40, 105, 168, 0.26); background: var(--blue-soft); }
+    .pill::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.7; }
+    .pill.on { color: #087454; border-color: #aedfcd; background: var(--green-soft); }
+    .pill.off { color: #a23831; border-color: #efc5c0; background: var(--red-soft); }
+    .pill.info { color: #1d5c9e; border-color: #c4d9f0; background: var(--blue-soft); }
 
-    .row-actions { display: flex; justify-content: flex-end; gap: 7px; flex-wrap: wrap; }
+    .row-actions { display: flex; justify-content: flex-end; gap: 5px; flex-wrap: nowrap; }
 
     .empty, .api-state {
-      padding: 26px 16px;
-      border: 1px dashed var(--line);
-      border-radius: 10px;
+      padding: 34px 18px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 11px;
       color: var(--muted);
-      background: rgba(255, 253, 247, 0.62);
+      background: var(--panel-tint);
       text-align: center;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
-    .api-state.error { color: #81231d; border-color: rgba(186, 58, 47, 0.35); background: var(--red-soft); }
+    .api-state.error { color: #9d342d; border-color: #e8b4af; background: var(--red-soft); }
 
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .form-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
     .switch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 
     .switch {
-      min-height: 44px;
-      padding: 9px 10px;
+      min-height: 52px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fffdf7;
+      border-radius: 11px;
+      background: var(--panel-tint);
       color: var(--ink);
       text-transform: none;
       font-size: 13px;
+      font-weight: 680;
       letter-spacing: 0;
+      cursor: pointer;
     }
 
-    .switch input { width: 19px; min-height: 19px; accent-color: var(--green); }
+    .switch input {
+      appearance: none;
+      width: 38px;
+      min-height: 22px;
+      margin: 0;
+      position: relative;
+      border: 0;
+      border-radius: 999px;
+      background: #b7c3bc;
+      cursor: pointer;
+      box-shadow: none;
+      transition: background-color 180ms ease;
+    }
+
+    .switch input::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      transition: transform 180ms ease;
+    }
+
+    .switch input:checked { background: var(--green); }
+    .switch input:checked::after { transform: translateX(16px); }
+    .switch input:focus-visible { box-shadow: var(--focus); }
 
     .rules-header {
-      margin-top: 16px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
 
-    .rules-list { display: grid; gap: 9px; margin-top: 10px; }
+    .rules-list { display: grid; gap: 10px; margin-top: 10px; }
 
     .rule {
       display: grid;
-      grid-template-columns: minmax(160px, 0.85fr) minmax(160px, 1fr) minmax(160px, 1.25fr) minmax(116px, 0.7fr) minmax(92px, 0.45fr) 42px;
-      gap: 8px;
+      grid-template-columns: minmax(148px, 0.8fr) minmax(150px, 1fr) minmax(210px, 1.35fr) minmax(112px, 0.62fr) minmax(84px, 0.42fr) 42px;
+      gap: 9px;
       align-items: end;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255, 253, 247, 0.74);
+      border-radius: 12px;
+      background: #f5f8f5;
     }
 
-    .rule button { min-height: 40px; }
+    .rule:hover { border-color: var(--line-strong); background: #f8fbf8; }
+    .rule > * { min-width: 0; }
+    .rule button { min-height: 42px; align-self: end; }
 
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      z-index: 20;
+      z-index: var(--z-modal);
       display: none;
       place-items: center;
-      padding: 18px;
-      background: rgba(23, 21, 19, 0.48);
+      padding: 20px;
+      background: rgba(4, 13, 10, 0.62);
+      backdrop-filter: blur(9px) saturate(0.8);
     }
 
-    .modal-backdrop.open { display: grid; }
+    .modal-backdrop.open { display: grid; animation: fade-in 180ms ease both; }
+
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
     .modal {
-      width: min(1080px, calc(100vw - 24px));
+      width: min(1120px, calc(100vw - 28px));
       max-height: min(92vh, 980px);
       overflow: auto;
-      border: 1px solid var(--black);
-      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-lg);
       background: var(--panel);
-      box-shadow: 9px 9px 0 rgba(32, 29, 25, 0.22);
+      box-shadow: var(--shadow-md);
+      animation: modal-in 220ms cubic-bezier(.2, .8, .2, 1) both;
+      scrollbar-color: #9aaba1 transparent;
     }
 
-    .modal.small { width: min(760px, calc(100vw - 24px)); }
+    @keyframes modal-in {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal.small { width: min(760px, calc(100vw - 28px)); }
+    .modal > .panel-head { position: sticky; top: 0; z-index: 3; min-height: 68px; padding: 14px 20px; background: rgba(251, 253, 251, 0.93); backdrop-filter: blur(16px); }
+    .modal > .panel-body { padding: 20px; }
 
     .modal-actions {
-      padding-top: 16px;
+      position: sticky;
+      bottom: -20px;
+      z-index: 2;
+      margin: 20px -20px -20px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--line);
       display: flex;
       justify-content: flex-end;
-      gap: 9px;
+      gap: 8px;
       flex-wrap: wrap;
+      background: rgba(251, 253, 251, 0.94);
+      backdrop-filter: blur(16px);
     }
 
     .toast {
       position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 30;
-      max-width: min(460px, calc(100vw - 36px));
-      padding: 12px 14px;
-      border: 1px solid var(--black);
-      border-radius: 10px;
-      color: var(--panel);
+      right: 20px;
+      bottom: 20px;
+      z-index: var(--z-toast);
+      max-width: min(440px, calc(100vw - 32px));
+      padding: 13px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      color: #f4faf6;
       background: var(--black);
-      box-shadow: var(--hard-shadow);
+      box-shadow: 0 18px 42px rgba(5, 17, 13, 0.24);
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(12px);
       pointer-events: none;
-      transition: 180ms ease;
+      transition: opacity 180ms ease, transform 180ms ease;
     }
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
     .url-box {
-      padding: 12px;
-      border: 1px dashed var(--black);
-      border-radius: 10px;
-      background: var(--blue-soft);
+      padding: 14px;
+      border: 1px solid #bfd5ca;
+      border-radius: 11px;
+      background: #eef8f3;
       overflow-wrap: anywhere;
-      line-height: 1.45;
+      line-height: 1.55;
     }
 
     .copyable {
@@ -540,42 +806,141 @@
       text-underline-offset: 3px;
     }
 
-    .hint-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-      line-height: 1.55;
+    .hint-list { margin: 0; padding-left: 19px; color: var(--muted); line-height: 1.7; }
+    .hint-list li + li { margin-top: 5px; }
+    .mini-stack { display: grid; gap: 11px; }
+    .section-gap { margin-top: 16px; }
+    .switch-gap { margin-top: 12px; }
+    .action-gap { margin-top: 8px; }
+
+    @media (max-width: 1360px) {
+      .grid.kpi { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .grid.two { grid-template-columns: 1fr; }
+      .daily-filterbar .compact-field.campaign { min-width: 210px; }
     }
 
-    .mini-stack { display: grid; gap: 8px; }
-
-    @media (max-width: 1180px) {
+    @media (max-width: 1040px) {
       .app-shell { grid-template-columns: 1fr; }
-      .sidebar { position: static; min-height: auto; }
-      .nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .brand { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
-      .brand-mark { margin: 0; }
-      .sidebar-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .grid.kpi { grid-template-columns: repeat(4, minmax(128px, 1fr)); }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: auto;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      }
+
+      .sidebar::after { display: none; }
+
+      .brand {
+        min-height: 0;
+        padding: 9px 12px;
+        border: 0;
+        border-right: 1px solid var(--sidebar-line);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-mark { width: 38px; height: 38px; margin: 0; border-radius: 11px 11px 11px 4px; }
+      .brand-mark svg { width: 19px; height: 19px; }
+      .brand h1 { font-size: 15px; line-height: 1; white-space: nowrap; }
+      .brand h1 br { display: none; }
+      .brand p { display: none; }
+
+      .nav {
+        padding: 8px;
+        display: flex;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .nav::-webkit-scrollbar { display: none; }
+      .nav button { min-width: max-content; min-height: 40px; padding: 0 11px; }
+
+      .sidebar-footer {
+        margin: 0;
+        padding: 8px;
+        border: 0;
+        border-left: 1px solid var(--sidebar-line);
+        display: block;
+      }
+
+      .sidebar-footer button { width: 40px; min-height: 40px; padding: 0; font-size: 0; }
+      .sidebar-footer .pill { display: none; }
+      .content { padding-top: 18px; }
+      .grid.kpi { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     }
 
     @media (max-width: 860px) {
-      .app-shell { width: min(100vw - 14px, 1540px); margin-top: 8px; }
-      .topbar { grid-template-columns: 1fr; }
-      .top-actions { justify-content: flex-start; }
-      .grid.two, .grid.three, .grid.four, .grid.kpi, .form-grid, .form-grid.three, .switch-grid { grid-template-columns: 1fr; }
-      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .rule { grid-template-columns: 1fr; }
+      .content { padding: 14px 12px 42px; }
+      .topbar { min-height: 96px; padding-top: 6px; }
+      .topbar h2 { font-size: clamp(27px, 8vw, 36px); }
+      .topbar p { font-size: 12px; }
+      .grid.kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.three, .grid.four { grid-template-columns: 1fr; }
+      .panel-head { align-items: flex-start; flex-wrap: wrap; }
+      .panel-head > .daily-filterbar { flex: 1 1 100%; }
+      .daily-filterbar { width: 100%; justify-content: flex-start; }
+      .daily-filterbar .compact-field, .daily-filterbar .compact-field.campaign { flex: 1 1 150px; max-width: none; min-width: 0; }
+      .daily-filterbar .daily-actions { flex: 1 1 100%; }
+      .daily-filterbar .daily-actions button { flex: 1; }
+      .toolbar-left, .toolbar-right { width: 100%; }
+      .toolbar input, .toolbar select { flex: 1 1 180px; max-width: none; }
+      .form-grid, .form-grid.three, .switch-grid { grid-template-columns: 1fr; }
+      .rule { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .rule label:nth-child(3) { grid-column: 1 / -1; }
+      .rule button { justify-self: end; }
       .row-actions { justify-content: flex-start; }
-      .daily-filterbar { width: 100%; flex-wrap: wrap; justify-content: flex-start; }
-      .daily-filterbar .compact-field, .daily-filterbar .compact-field.campaign { flex: 1 1 180px; max-width: none; }
-      .sidebar-footer { grid-template-columns: 1fr; }
-      .panel-body, .panel-head, .topbar, .brand { padding: 12px; }
-      table { min-width: 680px; }
+      table { min-width: 700px; }
+      .modal-backdrop { padding: 8px; }
+      .modal, .modal.small { width: calc(100vw - 16px); max-height: 96vh; border-radius: 15px; }
+      .modal > .panel-head, .modal > .panel-body { padding-left: 14px; padding-right: 14px; }
+      .modal-actions { bottom: -20px; margin-left: -14px; margin-right: -14px; padding-left: 14px; padding-right: 14px; }
+    }
+
+    @media (max-width: 620px) {
+      .sidebar { grid-template-columns: auto minmax(0, 1fr); }
+      .brand { padding-right: 8px; }
+      .brand h1 { display: none; }
+      .sidebar-footer { display: none; }
+      .nav button { font-size: 12px; }
+      .nav button svg { width: 16px; height: 16px; }
+      .content { padding-left: 8px; padding-right: 8px; }
+      .topbar { margin-bottom: 12px; padding-left: 6px; padding-right: 6px; }
+      .grid { gap: 10px; }
+      .grid.kpi { gap: 8px; }
+      .stat-card { min-height: 106px; padding: 14px 12px; }
+      .stat-card strong { font-size: 23px; }
+      .panel-head, .panel-body { padding: 12px; }
+      .panel-head > button { flex: 1 1 auto; }
+      .panel-head > .toolbar-right { width: 100%; }
+      .panel-head > .toolbar-right select, .panel-head > .toolbar-right button { flex: 1; }
+      .rule { grid-template-columns: 1fr; }
+      .rule label:nth-child(3) { grid-column: auto; }
+      .rule button { justify-self: stretch; width: 100%; }
+      .modal-actions button { flex: 1 1 140px; }
+      .toast { right: 8px; bottom: 8px; max-width: calc(100vw - 16px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Перейти к содержимому</a>
   <main class="app-shell">
     <aside class="sidebar">
       <div class="brand">
@@ -586,41 +951,41 @@
         </div>
       </div>
       <nav class="nav" aria-label="Основная навигация">
-        <button class="active" data-tab="dashboard"><i data-lucide="layout-dashboard"></i>Dashboard</button>
-        <button data-tab="campaigns"><i data-lucide="route"></i>Campaigns</button>
-        <button data-tab="offers"><i data-lucide="badge-dollar-sign"></i>Offers</button>
-        <button data-tab="sources"><i data-lucide="satellite-dish"></i>Sources</button>
-        <button data-tab="reports"><i data-lucide="bar-chart-3"></i>Logs / Reports</button>
-        <button data-tab="tools"><i data-lucide="wrench"></i>Tools</button>
+        <button type="button" class="active" data-tab="dashboard"><i data-lucide="layout-dashboard"></i>Обзор</button>
+        <button type="button" data-tab="campaigns"><i data-lucide="route"></i>Кампании</button>
+        <button type="button" data-tab="offers"><i data-lucide="badge-dollar-sign"></i>Офферы</button>
+        <button type="button" data-tab="sources"><i data-lucide="satellite-dish"></i>Источники</button>
+        <button type="button" data-tab="reports"><i data-lucide="bar-chart-3"></i>Статистика</button>
+        <button type="button" data-tab="tools"><i data-lucide="wrench"></i>Инструменты</button>
       </nav>
       <div class="sidebar-footer">
-        <button class="secondary" id="globalRefreshBtn"><i data-lucide="refresh-cw"></i>Обновить все</button>
-        <span class="pill info" id="apiHealth">API ready</span>
+        <button type="button" class="secondary" id="globalRefreshBtn"><i data-lucide="refresh-cw"></i>Обновить все</button>
+        <span class="pill info" id="apiHealth" aria-live="polite">API ready</span>
       </div>
     </aside>
 
-    <section class="content">
+    <section class="content" id="mainContent" tabindex="-1">
       <header class="topbar">
         <div>
           <p class="eyebrow" id="pageEyebrow">Control room</p>
-          <h2 id="pageTitle">Dashboard</h2>
-          <p id="pageDescription">Быстрый обзор трафика, конверсий и состояния кампаний. Если новые backend endpoints еще не готовы, блоки покажут fallback вместо падения интерфейса.</p>
+          <h2 id="pageTitle">Обзор</h2>
+          <p id="pageDescription">Клики, конверсии, доход и состояние активных маршрутов за один взгляд.</p>
         </div>
       </header>
 
       <section id="tab-dashboard" class="tab-panel active">
         <div class="grid kpi" id="dashboardKpis"></div>
-        <div class="grid two" style="margin-top:16px;">
+        <div class="grid two section-gap">
           <div class="panel">
             <div class="panel-head">
               <h3>Последние кампании</h3>
-              <button class="flat" data-tab-jump="campaigns"><i data-lucide="arrow-right"></i>К списку</button>
+              <button type="button" class="flat" data-tab-jump="campaigns"><i data-lucide="arrow-right"></i>К списку</button>
             </div>
             <div class="panel-body" id="dashboardCampaigns"></div>
           </div>
           <div class="panel">
             <div class="panel-head">
-              <h3>Performance breakdown</h3>
+              <h3>Срез эффективности</h3>
               <div class="toolbar-right">
                 <select id="dashboardGroup">
                   <option value="campaign">Campaign</option>
@@ -640,7 +1005,7 @@
         <div class="panel">
           <div class="panel-head">
             <h3>Кампании</h3>
-            <button class="success" id="newCampaignBtn"><i data-lucide="plus"></i>Новая кампания</button>
+            <button type="button" class="success" id="newCampaignBtn"><i data-lucide="plus"></i>Новая кампания</button>
           </div>
           <div class="panel-body">
             <div class="toolbar">
@@ -653,7 +1018,7 @@
                 </select>
               </div>
               <div class="toolbar-right">
-                <button class="secondary" id="reloadCampaignsBtn"><i data-lucide="rotate-cw"></i>Reload</button>
+                <button type="button" class="secondary" id="reloadCampaignsBtn"><i data-lucide="rotate-cw"></i>Обновить</button>
               </div>
             </div>
             <div class="table-wrap" id="campaignsTable"></div>
@@ -665,7 +1030,7 @@
         <div class="panel">
           <div class="panel-head">
             <h3>Офферы</h3>
-            <button class="success" id="newOfferBtn"><i data-lucide="plus"></i>Новый оффер</button>
+            <button type="button" class="success" id="newOfferBtn"><i data-lucide="plus"></i>Новый оффер</button>
           </div>
           <div class="panel-body">
             <div class="toolbar">
@@ -677,7 +1042,7 @@
                   <option value="paused">Выключенные</option>
                 </select>
               </div>
-              <button class="secondary" id="reloadOffersBtn"><i data-lucide="rotate-cw"></i>Reload</button>
+              <button type="button" class="secondary" id="reloadOffersBtn"><i data-lucide="rotate-cw"></i>Обновить</button>
             </div>
             <div class="table-wrap" id="offersTable"></div>
           </div>
@@ -688,14 +1053,14 @@
         <div class="panel">
           <div class="panel-head">
             <h3>Источники трафика</h3>
-            <button class="success" id="newSourceBtn"><i data-lucide="plus"></i>Новый источник</button>
+            <button type="button" class="success" id="newSourceBtn"><i data-lucide="plus"></i>Новый источник</button>
           </div>
           <div class="panel-body">
             <div class="toolbar">
               <div class="toolbar-left">
                 <input id="sourceSearch" type="search" placeholder="Поиск по названию источника">
               </div>
-              <button class="secondary" id="reloadSourcesBtn"><i data-lucide="rotate-cw"></i>Reload</button>
+              <button type="button" class="secondary" id="reloadSourcesBtn"><i data-lucide="rotate-cw"></i>Обновить</button>
             </div>
             <div class="table-wrap" id="sourcesTable"></div>
           </div>
@@ -704,25 +1069,25 @@
 
       <section id="tab-reports" class="tab-panel">
         <div class="grid kpi" id="reportKpis"></div>
-        <div class="panel" style="margin-top:16px;">
+        <div class="panel section-gap">
           <div class="panel-head">
-            <h3>Daily stats</h3>
+            <h3>Статистика по дням</h3>
             <div class="daily-filterbar">
               <label class="compact-field campaign">Кампания<select id="dailyCampaign"></select></label>
               <label class="compact-field">Дата от<input id="dailyFrom" type="date"></label>
               <label class="compact-field">Дата до<input id="dailyTo" type="date"></label>
               <label class="compact-switch"><input id="reportUniqueOnly" type="checkbox">Не считать повторы</label>
               <div class="daily-actions">
-                <button class="secondary" id="clearDailyBtn"><i data-lucide="eraser"></i>Очистить</button>
-                <button class="secondary" id="reloadDailyBtn"><i data-lucide="refresh-cw"></i>Обновить</button>
+                <button type="button" class="secondary" id="clearDailyBtn"><i data-lucide="eraser"></i>Очистить</button>
+                <button type="button" class="secondary" id="reloadDailyBtn"><i data-lucide="refresh-cw"></i>Обновить</button>
               </div>
             </div>
           </div>
           <div class="panel-body" id="dailyStats"></div>
         </div>
-        <div class="panel" style="margin-top:16px;">
+        <div class="panel section-gap">
           <div class="panel-head">
-            <h3>Breakdown</h3>
+            <h3>Срез данных</h3>
             <div class="toolbar-right">
               <select id="reportGroup">
                 <option value="campaign">Campaign</option>
@@ -732,18 +1097,18 @@
                 <option value="device">Device</option>
                 <option value="sub_id_1">Sub ID 1</option>
               </select>
-              <button class="secondary" id="reloadReportsBtn"><i data-lucide="rotate-cw"></i>Обновить</button>
+              <button type="button" class="secondary" id="reloadReportsBtn"><i data-lucide="rotate-cw"></i>Обновить</button>
             </div>
           </div>
           <div class="panel-body" id="reportBreakdown"></div>
         </div>
-        <div class="grid two" style="margin-top:16px;">
+        <div class="grid two section-gap">
           <div class="panel">
-            <div class="panel-head"><h3>Recent clicks</h3><span class="pill">click_id copy</span></div>
+            <div class="panel-head"><h3>Последние клики</h3><span class="pill">click_id copy</span></div>
             <div class="panel-body" id="clicksLog"></div>
           </div>
           <div class="panel">
-            <div class="panel-head"><h3>Recent conversions</h3><span class="pill">postback log</span></div>
+            <div class="panel-head"><h3>Последние конверсии</h3><span class="pill">postback log</span></div>
             <div class="panel-body" id="conversionsLog"></div>
           </div>
         </div>
@@ -770,9 +1135,9 @@
                     <option value="all">All</option>
                   </select>
                 </label>
-                <label>Source label<input id="simSource" placeholder="facebook / test" value="test"></label>
+                <label>Source label<input id="simSource" type="text" placeholder="facebook / test" value="test"></label>
               </div>
-              <button id="simulateBtn"><i data-lucide="route"></i>Проверить маршрут</button>
+              <button type="button" id="simulateBtn"><i data-lucide="route"></i>Проверить маршрут</button>
               <div id="simulateResult" class="url-box muted">Выбери кампанию, страну и устройство.</div>
             </div>
           </div>
@@ -782,18 +1147,18 @@
             <div class="panel-body mini-stack">
               <label>Кампания<select id="builderCampaign"></select></label>
               <div class="form-grid">
-                <label>Source<input id="builderSource" placeholder="facebook"></label>
-                <label>Cost<input id="builderCost" placeholder="{cost} или 0.12"></label>
-                <label>Sub ID 1<input id="builderSub1" placeholder="{campaign_id}"></label>
-                <label>Sub ID 2<input id="builderSub2" placeholder="{creative_id}"></label>
+                <label>Source<input id="builderSource" type="text" placeholder="facebook"></label>
+                <label>Cost<input id="builderCost" type="text" placeholder="{cost} или 0.12"></label>
+                <label>Sub ID 1<input id="builderSub1" type="text" placeholder="{campaign_id}"></label>
+                <label>Sub ID 2<input id="builderSub2" type="text" placeholder="{creative_id}"></label>
               </div>
-              <button class="secondary" id="buildUrlBtn"><i data-lucide="link"></i>Собрать URL</button>
+              <button type="button" class="secondary" id="buildUrlBtn"><i data-lucide="link"></i>Собрать URL</button>
               <div id="builtUrl" class="url-box muted">URL появится здесь.</div>
             </div>
           </div>
         </div>
 
-        <div class="panel" style="margin-top:16px;">
+        <div class="panel section-gap">
           <div class="panel-head"><h3>Макросы и postback</h3><span class="pill">операторская шпаргалка</span></div>
           <div class="panel-body">
             <div class="grid two">
@@ -816,11 +1181,11 @@
     </section>
   </main>
 
-  <div id="campaignModal" class="modal-backdrop" aria-hidden="true">
+  <div id="campaignModal" class="modal-backdrop" aria-hidden="true" inert>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="campaignModalTitle">
       <div class="panel-head">
         <h3 id="campaignModalTitle">Кампания</h3>
-        <button class="flat" data-close-modal="campaignModal"><i data-lucide="x"></i>Закрыть</button>
+        <button type="button" class="flat" data-close-modal="campaignModal"><i data-lucide="x"></i>Закрыть</button>
       </div>
       <div class="panel-body">
         <div class="form-grid">
@@ -829,29 +1194,29 @@
           <label class="wide">Default URL<input id="campaignDefaultUrl" type="url" placeholder="https://example.com/fallback"></label>
           <label>Лимит кликов<input id="campaignClickLimit" type="number" min="1" placeholder="Без лимита"></label>
         </div>
-        <div class="switch-grid" style="margin-top:12px;">
+        <div class="switch-grid switch-gap">
           <label class="switch"><span>Активна</span><input id="campaignActive" type="checkbox" checked></label>
           <label class="switch"><span>Блокировать ботов</span><input id="campaignBlockBots" type="checkbox" checked></label>
         </div>
         <div class="rules-header">
           <h3 class="eyebrow">GEO правила</h3>
-          <button class="secondary" id="addRuleBtn"><i data-lucide="plus"></i>Правило</button>
+          <button type="button" class="secondary" id="addRuleBtn"><i data-lucide="plus"></i>Правило</button>
         </div>
         <div class="rules-list" id="campaignRules"></div>
         <div class="modal-actions">
-          <button class="secondary" id="copyCampaignUrlBtn"><i data-lucide="copy"></i>Скопировать Go URL</button>
-          <button class="flat" data-close-modal="campaignModal"><i data-lucide="x"></i>Отмена</button>
-          <button class="success" id="saveCampaignBtn"><i data-lucide="save"></i>Сохранить</button>
+          <button type="button" class="secondary" id="copyCampaignUrlBtn"><i data-lucide="copy"></i>Скопировать Go URL</button>
+          <button type="button" class="flat" data-close-modal="campaignModal"><i data-lucide="x"></i>Отмена</button>
+          <button type="button" class="success" id="saveCampaignBtn"><i data-lucide="save"></i>Сохранить</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="offerModal" class="modal-backdrop" aria-hidden="true">
+  <div id="offerModal" class="modal-backdrop" aria-hidden="true" inert>
     <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="offerModalTitle">
       <div class="panel-head">
         <h3 id="offerModalTitle">Оффер</h3>
-        <button class="flat" data-close-modal="offerModal"><i data-lucide="x"></i>Закрыть</button>
+        <button type="button" class="flat" data-close-modal="offerModal"><i data-lucide="x"></i>Закрыть</button>
       </div>
       <div class="panel-body">
         <div class="form-grid">
@@ -871,22 +1236,22 @@
           <label>Страны<select id="offerCountries" multiple size="7"></select></label>
           <label class="wide">Заметки<textarea id="offerNotes" placeholder="Условия, ограничения, комментарии"></textarea></label>
         </div>
-        <div class="switch-grid" style="margin-top:12px;">
+        <div class="switch-grid switch-gap">
           <label class="switch"><span>Активен</span><input id="offerActive" type="checkbox" checked></label>
         </div>
         <div class="modal-actions">
-          <button class="flat" data-close-modal="offerModal"><i data-lucide="x"></i>Отмена</button>
-          <button class="success" id="saveOfferBtn"><i data-lucide="save"></i>Сохранить</button>
+          <button type="button" class="flat" data-close-modal="offerModal"><i data-lucide="x"></i>Отмена</button>
+          <button type="button" class="success" id="saveOfferBtn"><i data-lucide="save"></i>Сохранить</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="sourceModal" class="modal-backdrop" aria-hidden="true">
+  <div id="sourceModal" class="modal-backdrop" aria-hidden="true" inert>
     <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
       <div class="panel-head">
         <h3 id="sourceModalTitle">Источник трафика</h3>
-        <button class="flat" data-close-modal="sourceModal"><i data-lucide="x"></i>Закрыть</button>
+        <button type="button" class="flat" data-close-modal="sourceModal"><i data-lucide="x"></i>Закрыть</button>
       </div>
       <div class="panel-body">
         <div class="form-grid">
@@ -896,14 +1261,14 @@
           <label class="wide">Param mappings JSON<textarea id="sourceMappings" class="mono" placeholder='{"campaign_id":"utm_campaign","creative_id":"utm_content","cost":"cost","sub_id_1":"adset"}'></textarea></label>
         </div>
         <div class="modal-actions">
-          <button class="flat" data-close-modal="sourceModal"><i data-lucide="x"></i>Отмена</button>
-          <button class="success" id="saveSourceBtn"><i data-lucide="save"></i>Сохранить</button>
+          <button type="button" class="flat" data-close-modal="sourceModal"><i data-lucide="x"></i>Отмена</button>
+          <button type="button" class="success" id="saveSourceBtn"><i data-lucide="save"></i>Сохранить</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
     const state = {
@@ -931,12 +1296,12 @@
     const countryNames = typeof Intl !== 'undefined' && Intl.DisplayNames ? new Intl.DisplayNames(['ru'], { type: 'region' }) : null;
 
     const PAGE_META = {
-      dashboard: ['Control room', 'Dashboard', 'Быстрый обзор трафика, конверсий и состояния кампаний.'],
-      campaigns: ['Routing', 'Campaigns', 'Создание мультиссылок, GEO/device правила, веса, fallback и active toggle.'],
-      offers: ['Inventory', 'Offers', 'Сохраненные офферы с payout, странами, сетью, cap и заметками.'],
-      sources: ['Acquisition', 'Sources', 'Шаблоны источников трафика, postback URL и mapping входящих параметров.'],
-      reports: ['Analytics', 'Logs / Reports', 'CR, ROI, revenue, profit, breakdown, recent clicks и conversions.'],
-      tools: ['QA', 'Tools', 'Проверка редиректа без записи клика, генератор ссылок и рабочие макросы.'],
+      dashboard: ['Control room', 'Обзор', 'Клики, конверсии, доход и состояние активных маршрутов за один взгляд.'],
+      campaigns: ['Routing', 'Кампании', 'Мультиссылки, GEO-правила, устройства, веса и резервные направления.'],
+      offers: ['Inventory', 'Офферы', 'Сохранённые ссылки, выплаты, страны, партнёрские сети и лимиты.'],
+      sources: ['Acquisition', 'Источники', 'Шаблоны источников трафика, postback URL и сопоставление параметров.'],
+      reports: ['Analytics', 'Статистика', 'Динамика по дням, срезы, клики, конверсии и финансовые показатели.'],
+      tools: ['Quality assurance', 'Инструменты', 'Безопасная проверка маршрута, генератор ссылок и рабочие макросы.'],
     };
     const TAB_IDS = Object.keys(PAGE_META);
     const TAB_STORAGE_KEY = 'geoTracker.activeTab';
@@ -966,7 +1331,12 @@
     const COUNTRY_CODES = ['*', ...supportedCountryCodes()];
 
     function icon(name, extra = '') { return `<i data-lucide="${name}" ${extra}></i>`; }
-    function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
+    function refreshIcons() {
+      if (window.lucide) window.lucide.createIcons();
+      document.querySelectorAll('button[title]:not([aria-label])').forEach((button) => {
+        button.setAttribute('aria-label', button.title);
+      });
+    }
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -1046,17 +1416,29 @@
     }
 
     function openModal(id) {
+      window.__modalReturnFocus = document.activeElement;
+      $(id).removeAttribute('inert');
       $(id).classList.add('open');
       $(id).setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
       refreshIcons();
+      requestAnimationFrame(() => {
+        const focusTarget = $(id).querySelector('.panel-body input:not([type="hidden"]), .panel-body select, .panel-body textarea')
+          || $(id).querySelector('button');
+        focusTarget?.focus();
+      });
     }
 
     function closeModal(id) {
       $(id).classList.remove('open');
       $(id).setAttribute('aria-hidden', 'true');
+      $(id).setAttribute('inert', '');
+      if (!document.querySelector('.modal-backdrop.open')) document.body.classList.remove('modal-open');
       if (id === 'campaignModal') state.editingCampaignId = null;
       if (id === 'offerModal') state.editingOfferId = null;
       if (id === 'sourceModal') state.editingSourceId = null;
+      window.__modalReturnFocus?.focus?.();
+      window.__modalReturnFocus = null;
     }
 
     function getInitialTab() {
@@ -1083,7 +1465,12 @@
       if (!options.skipHash && location.hash.replace(/^#/, '') !== normalized) {
         history.replaceState(null, '', `#${normalized}`);
       }
-      document.querySelectorAll('.nav button').forEach((button) => button.classList.toggle('active', button.dataset.tab === normalized));
+      document.querySelectorAll('.nav button').forEach((button) => {
+        const active = button.dataset.tab === normalized;
+        button.classList.toggle('active', active);
+        if (active) button.setAttribute('aria-current', 'page');
+        else button.removeAttribute('aria-current');
+      });
       document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `tab-${normalized}`));
       const [eyebrow, title, description] = PAGE_META[normalized];
       $('pageEyebrow').textContent = eyebrow;
@@ -1133,7 +1520,7 @@
           <td><span class="pill ${campaign.is_active ? 'on' : 'off'}">${campaign.is_active ? 'active' : 'paused'}</span></td>
           <td class="mono">${Number(campaign.link_count || 0)}</td>
           <td class="mono">${Number(campaign.click_count || 0)}</td>
-          <td><button class="icon secondary" title="Copy" data-copy="${escapeHtml(publicUrl(campaign.slug))}">${icon('copy')}</button></td>
+          <td><button type="button" class="icon secondary" title="Copy" data-copy="${escapeHtml(publicUrl(campaign.slug))}">${icon('copy')}</button></td>
         </tr>`).join('')}</tbody>
       </table></div>`;
       refreshIcons();
@@ -1226,12 +1613,12 @@
           <td class="mono">${Number(campaign.clicks_24h || 0)}</td>
           <td class="truncate">${escapeHtml(campaign.default_url || '')}</td>
           <td><div class="row-actions">
-            <button class="icon secondary" title="Редактировать" data-campaign-action="edit" data-id="${campaign.id}">${icon('square-pen')}</button>
-            <button class="icon secondary" title="Скопировать Go URL" data-copy="${escapeHtml(publicUrl(campaign.slug))}">${icon('copy')}</button>
-            <button class="icon secondary" title="Открыть" data-open="${escapeHtml(publicUrl(campaign.slug))}">${icon('external-link')}</button>
-            <button class="icon secondary" title="Дублировать" data-campaign-action="duplicate" data-id="${campaign.id}">${icon('copy-plus')}</button>
-            <button class="icon ${campaign.is_active ? 'secondary' : 'success'}" title="${campaign.is_active ? 'Выключить' : 'Включить'}" data-campaign-action="toggle" data-id="${campaign.id}" data-value="${campaign.is_active ? 'false' : 'true'}">${icon(campaign.is_active ? 'pause' : 'play')}</button>
-            <button class="icon danger" title="Удалить" data-campaign-action="delete" data-id="${campaign.id}">${icon('trash-2')}</button>
+            <button type="button" class="icon secondary" title="Редактировать" data-campaign-action="edit" data-id="${campaign.id}">${icon('square-pen')}</button>
+            <button type="button" class="icon secondary" title="Скопировать Go URL" data-copy="${escapeHtml(publicUrl(campaign.slug))}">${icon('copy')}</button>
+            <button type="button" class="icon secondary" title="Открыть" data-open="${escapeHtml(publicUrl(campaign.slug))}">${icon('external-link')}</button>
+            <button type="button" class="icon secondary" title="Дублировать" data-campaign-action="duplicate" data-id="${campaign.id}">${icon('copy-plus')}</button>
+            <button type="button" class="icon ${campaign.is_active ? 'secondary' : 'success'}" title="${campaign.is_active ? 'Выключить' : 'Включить'}" data-campaign-action="toggle" data-id="${campaign.id}" data-value="${campaign.is_active ? 'false' : 'true'}">${icon(campaign.is_active ? 'pause' : 'play')}</button>
+            <button type="button" class="icon danger" title="Удалить" data-campaign-action="delete" data-id="${campaign.id}">${icon('trash-2')}</button>
           </div></td>
         </tr>`).join('')}</tbody>
       </table>`;
@@ -1269,9 +1656,9 @@
           <td class="mono">${escapeHtml(offer.payout_type || 'CPA')} ${Number(offer.payout || 0) ? fmtMoney(offer.payout) : '-'}</td>
           <td class="mono">${offer.conversion_cap || '-'}</td>
           <td><div class="row-actions">
-            <button class="icon secondary" title="Редактировать" data-offer-action="edit" data-id="${offer.id}">${icon('square-pen')}</button>
-            <button class="icon secondary" title="Скопировать URL" data-copy="${escapeHtml(offer.url)}">${icon('copy')}</button>
-            <button class="icon danger" title="Удалить" data-offer-action="delete" data-id="${offer.id}">${icon('trash-2')}</button>
+            <button type="button" class="icon secondary" title="Редактировать" data-offer-action="edit" data-id="${offer.id}">${icon('square-pen')}</button>
+            <button type="button" class="icon secondary" title="Скопировать URL" data-copy="${escapeHtml(offer.url)}">${icon('copy')}</button>
+            <button type="button" class="icon danger" title="Удалить" data-offer-action="delete" data-id="${offer.id}">${icon('trash-2')}</button>
           </div></td>
         </tr>`).join('')}</tbody>
       </table>`;
@@ -1301,8 +1688,8 @@
           <td class="mono truncate">${escapeHtml(JSON.stringify(sourceMappings(source)))}</td>
           <td class="truncate">${escapeHtml(source.postback_url || '-')}</td>
           <td><div class="row-actions">
-            <button class="icon secondary" title="Редактировать" data-source-action="edit" data-id="${source.id}">${icon('square-pen')}</button>
-            <button class="icon danger" title="Удалить" data-source-action="delete" data-id="${source.id}">${icon('trash-2')}</button>
+            <button type="button" class="icon secondary" title="Редактировать" data-source-action="edit" data-id="${source.id}">${icon('square-pen')}</button>
+            <button type="button" class="icon danger" title="Удалить" data-source-action="delete" data-id="${source.id}">${icon('trash-2')}</button>
           </div></td>
         </tr>`).join('')}</tbody>
       </table>`;
@@ -1784,7 +2171,7 @@
       };
       Object.entries(params).forEach(([key, value]) => { if (value) url.searchParams.set(key, value); });
       $('builtUrl').className = 'url-box';
-      $('builtUrl').innerHTML = `<span class="mono">${escapeHtml(url.toString())}</span><div style="margin-top:8px;"><button class="secondary" data-copy="${escapeHtml(url.toString())}">${icon('copy')}Скопировать</button></div>`;
+      $('builtUrl').innerHTML = `<span class="mono">${escapeHtml(url.toString())}</span><div class="action-gap"><button type="button" class="secondary" data-copy="${escapeHtml(url.toString())}">${icon('copy')}Скопировать</button></div>`;
       refreshIcons();
     }
 
@@ -1816,6 +2203,32 @@
 
     document.querySelectorAll('.modal-backdrop').forEach((modal) => {
       modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(modal.id); });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const backdrop = document.querySelector('.modal-backdrop.open');
+      if (!backdrop) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeModal(backdrop.id);
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = [...backdrop.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')]
+        .filter((node) => !node.disabled && node.getClientRects().length);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     });
 
     document.querySelectorAll('.nav button').forEach((button) => button.addEventListener('click', () => setActiveTab(button.dataset.tab)));
