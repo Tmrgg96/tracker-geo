@@ -30,19 +30,20 @@ function renderVpnGatePage(continueUrl) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <meta name="theme-color" content="#0b1714">
+  <meta name="theme-color" content="#eef6ff">
   <title>Проверка подключения</title>
   <style>
     :root {
-      color-scheme: dark;
-      --ink: #f4faf6;
-      --muted: #9cb0a7;
-      --surface: #101f1a;
-      --surface-strong: #152a23;
-      --line: rgba(224, 245, 234, .14);
-      --lime: #d8f36d;
-      --green: #22b887;
-      --shadow: 0 32px 90px rgba(0, 0, 0, .38);
+      color-scheme: light;
+      --ink: #1b2b40;
+      --muted: #64778f;
+      --surface: #ffffff;
+      --surface-strong: #eaf4ff;
+      --line: #d5e3f2;
+      --blue: #4d86c6;
+      --blue-strong: #2f6eae;
+      --blue-soft: #cfe5fb;
+      --shadow: 0 28px 80px rgba(45, 88, 132, .17);
     }
 
     * { box-sizing: border-box; }
@@ -57,11 +58,11 @@ function renderVpnGatePage(continueUrl) {
       color: var(--ink);
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 18% 12%, rgba(34, 184, 135, .22), transparent 28rem),
-        radial-gradient(circle at 90% 88%, rgba(216, 243, 109, .10), transparent 24rem),
-        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px),
-        #08120f;
+        radial-gradient(circle at 18% 12%, rgba(126, 181, 233, .28), transparent 28rem),
+        radial-gradient(circle at 90% 88%, rgba(190, 219, 248, .34), transparent 24rem),
+        linear-gradient(rgba(64, 116, 169, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(64, 116, 169, .04) 1px, transparent 1px),
+        #f5f9fe;
       background-size: auto, auto, 32px 32px, 32px 32px, auto;
     }
 
@@ -72,7 +73,7 @@ function renderVpnGatePage(continueUrl) {
       border: 1px solid var(--line);
       border-radius: 26px;
       overflow: hidden;
-      background: rgba(16, 31, 26, .94);
+      background: rgba(255, 255, 255, .96);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
       animation: arrive .45s cubic-bezier(.2, .8, .2, 1) both;
@@ -88,7 +89,7 @@ function renderVpnGatePage(continueUrl) {
       place-items: center;
       border-left: 1px solid var(--line);
       background:
-        linear-gradient(145deg, rgba(216, 243, 109, .08), transparent 54%),
+        linear-gradient(145deg, rgba(255, 255, 255, .72), transparent 54%),
         var(--surface-strong);
       overflow: hidden;
     }
@@ -96,7 +97,7 @@ function renderVpnGatePage(continueUrl) {
     .visual::before, .visual::after {
       content: "";
       position: absolute;
-      border: 1px solid rgba(216, 243, 109, .18);
+      border: 1px solid rgba(77, 134, 198, .22);
       border-radius: 50%;
     }
 
@@ -110,10 +111,10 @@ function renderVpnGatePage(continueUrl) {
       z-index: 1;
       display: grid;
       place-items: center;
-      color: #0b1714;
+      color: #ffffff;
       border-radius: 34px 34px 34px 12px;
-      background: var(--lime);
-      box-shadow: 0 22px 50px rgba(216, 243, 109, .17);
+      background: var(--blue);
+      box-shadow: 0 22px 50px rgba(77, 134, 198, .24);
       transform: rotate(-4deg);
     }
 
@@ -121,7 +122,7 @@ function renderVpnGatePage(continueUrl) {
 
     .eyebrow {
       margin: 0 0 18px;
-      color: var(--green);
+      color: var(--blue-strong);
       font-size: 11px;
       font-weight: 800;
       letter-spacing: .14em;
@@ -157,7 +158,7 @@ function renderVpnGatePage(continueUrl) {
       display: flex;
       align-items: center;
       gap: 11px;
-      color: #dbe8e1;
+      color: #344a64;
       font-size: 14px;
       counter-increment: steps;
     }
@@ -171,8 +172,8 @@ function renderVpnGatePage(continueUrl) {
       place-items: center;
       border: 1px solid var(--line);
       border-radius: 9px;
-      color: var(--lime);
-      background: rgba(255, 255, 255, .035);
+      color: var(--blue-strong);
+      background: #f7fbff;
       font-size: 12px;
       font-weight: 800;
     }
@@ -186,20 +187,20 @@ function renderVpnGatePage(continueUrl) {
       justify-content: center;
       gap: 10px;
       border-radius: 15px;
-      color: #0a1511;
-      background: var(--lime);
+      color: #ffffff;
+      background: var(--blue);
       font-size: 15px;
       font-weight: 850;
       text-decoration: none;
-      box-shadow: 0 14px 32px rgba(216, 243, 109, .13);
+      box-shadow: 0 14px 32px rgba(77, 134, 198, .22);
       transition: background-color .18s ease, box-shadow .18s ease;
     }
 
-    .continue:hover { background: #e3fa83; box-shadow: 0 18px 38px rgba(216, 243, 109, .19); }
-    .continue:focus-visible { outline: 3px solid rgba(216, 243, 109, .38); outline-offset: 3px; }
-    .continue[aria-busy="true"] { color: #385044; background: #b7ca73; pointer-events: none; }
+    .continue:hover { background: var(--blue-strong); box-shadow: 0 18px 38px rgba(77, 134, 198, .28); }
+    .continue:focus-visible { outline: 3px solid rgba(77, 134, 198, .28); outline-offset: 3px; }
+    .continue[aria-busy="true"] { color: #f1f7fd; background: #7ea7d2; pointer-events: none; }
 
-    .note { margin: 14px 0 0; color: #71877d; font-size: 12px; line-height: 1.5; text-align: center; }
+    .note { margin: 14px 0 0; color: #7a8da3; font-size: 12px; line-height: 1.5; text-align: center; }
 
     @keyframes arrive {
       from { opacity: 0; transform: translateY(12px) scale(.99); }
@@ -227,9 +228,9 @@ function renderVpnGatePage(continueUrl) {
 <body>
   <main class="shell">
     <section class="main">
-      <p class="eyebrow">Проверка подключения</p>
-      <h1>Отключите VPN перед продолжением</h1>
-      <p class="lead">Так мы заново определим вашу страну и откроем правильное предложение.</p>
+      <p class="eyebrow">Доступ к бонусу</p>
+      <h1>Если вы из России, отключите VPN</h1>
+      <p class="lead">Отключите VPN для получения бонуса. С включённым VPN сервис работать не будет.</p>
       <ol class="steps">
         <li>Выключите VPN или прокси</li>
         <li>Подождите пару секунд</li>
@@ -239,7 +240,7 @@ function renderVpnGatePage(continueUrl) {
         <span id="buttonLabel">VPN выключен, продолжить</span>
         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-      <p class="note">Если VPN уже был выключен, просто продолжите. Ваш IP будет проверен заново.</p>
+      <p class="note">Если VPN уже выключен, просто нажмите кнопку.</p>
     </section>
     <aside class="visual" aria-hidden="true">
       <div class="signal">
@@ -254,7 +255,7 @@ function renderVpnGatePage(continueUrl) {
       event.preventDefault();
       if (button.getAttribute('aria-busy') === 'true') return;
       button.setAttribute('aria-busy', 'true');
-      label.textContent = 'Проверяем подключение...';
+      label.textContent = 'Открываем предложение...';
       window.setTimeout(() => window.location.assign(button.href), 850);
     });
   </script>

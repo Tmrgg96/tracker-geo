@@ -220,7 +220,7 @@ test('VPN gate preserves tracking params and routes by the fresh IP only after c
     assert.match(initialResponse.headers.get('content-type'), /^text\/html/);
     assert.match(initialResponse.headers.get('cache-control'), /no-store/);
     const html = await initialResponse.text();
-    assert.match(html, /Отключите VPN перед продолжением/);
+    assert.match(html, /Если вы из России, отключите VPN/);
     assert.equal(inserts.length, 0);
 
     const href = html.match(/id="continueButton" href="([^"]+)"/)[1].replaceAll('&amp;', '&');
