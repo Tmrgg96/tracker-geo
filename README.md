@@ -10,6 +10,7 @@
   - типу устройства (`all`, `desktop`, `mobile`, `tablet`)
   - весу (`weight`) для ротации
 - Fallback на `default_url`, если страна не найдена
+- Опциональный VPN-прелендинг для повторного определения GEO перед редиректом
 - Лог кликов в PostgreSQL
 - Веб-админка: `/admin`
 
@@ -78,6 +79,7 @@ curl -X POST http://localhost:8080/api/admin/tds/campaigns \
     "name": "Main campaign",
     "slug": "main-geo",
     "default_url": "https://example.com/default",
+    "vpn_gate_enabled": true,
     "links": [
       {"country_code":"US","url":"https://example.com/us","device_type":"all","weight":100},
       {"country_code":"KZ","url":"https://example.com/kz","device_type":"mobile","weight":100}

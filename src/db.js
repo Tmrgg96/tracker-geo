@@ -24,6 +24,7 @@ async function initSchema() {
       start_date TIMESTAMPTZ DEFAULT NULL,
       end_date TIMESTAMPTZ DEFAULT NULL,
       block_bots BOOLEAN DEFAULT TRUE,
+      vpn_gate_enabled BOOLEAN DEFAULT FALSE,
       is_active BOOLEAN DEFAULT TRUE,
       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -121,6 +122,7 @@ async function initSchema() {
     );
   `);
 
+  await addColumnIfMissing('tds_campaigns', 'vpn_gate_enabled', 'BOOLEAN DEFAULT FALSE');
   await addColumnIfMissing('tds_campaign_links', 'offer_id', 'INT REFERENCES tds_offers(id) ON DELETE SET NULL');
 
   await addColumnIfMissing('tds_offers', 'payout_type', "VARCHAR(20) DEFAULT 'CPA'");

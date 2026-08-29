@@ -6,6 +6,7 @@ const { detectDevice } = require('../utils/deviceDetector');
 const { isBot } = require('../utils/botDetector');
 const { selectRedirectUrl } = require('../utils/redirectSelector');
 const { applyRedirectMacros, scalar } = require('../utils/urlMacros');
+const { VPN_GATE_PARAM, isVpnGateConfirmed, sendVpnGatePage } = require('../utils/vpnGate');
 
 function getClientIp(req) {
   const raw = String(req.ip || req.socket?.remoteAddress || '').trim();
@@ -62,6 +63,7 @@ function extractUserAgentDetails(userAgent) {
 
 function extractTrackingParams(req) {
   const params = normalizeParams(req.query || {});
+  delete params[VPN_GATE_PARAM];
   const sourceId = parseInteger(pickParam(params, ['source_id', 'traffic_source_id']));
 
   const tracking = {
@@ -349,6 +351,10 @@ function buildPublicRoutes(pool) {
       const detectedBot = isBot(ua, req.headers);
       if (campaign.block_bots && detectedBot) {
         return res.status(404).send('Link not found');
+      }
+
+      if (campaign.vpn_gate_enabled && !isVpnGateConfirmed(req)) {
+        return sendVpnGatePage(req, res);
       }
 
       let limitReached = false;

@@ -112,6 +112,7 @@ function parseCampaignPayload(body, options = {}) {
     start_date: body.start_date || null,
     end_date: body.end_date || null,
     block_bots: body.block_bots === undefined ? options.defaultBlockBots ?? true : parseBoolean(body.block_bots),
+    vpn_gate_enabled: body.vpn_gate_enabled === undefined ? options.defaultVpnGate ?? false : parseBoolean(body.vpn_gate_enabled),
     is_active: body.is_active === undefined ? options.defaultActive ?? true : parseBoolean(body.is_active),
     links: normalizeLinks(body.links || []),
   };
@@ -378,10 +379,10 @@ function buildAdminRoutes(pool) {
 
       const campaignResult = await client.query(
         `INSERT INTO tds_campaigns
-           (name, slug, default_url, click_limit, start_date, end_date, block_bots, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           (name, slug, default_url, click_limit, start_date, end_date, block_bots, vpn_gate_enabled, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
-        [payload.name, payload.slug, payload.default_url, payload.click_limit, payload.start_date, payload.end_date, payload.block_bots, payload.is_active]
+        [payload.name, payload.slug, payload.default_url, payload.click_limit, payload.start_date, payload.end_date, payload.block_bots, payload.vpn_gate_enabled, payload.is_active]
       );
 
       const campaign = campaignResult.rows[0];
@@ -438,10 +439,10 @@ function buildAdminRoutes(pool) {
       const updateResult = await client.query(
         `UPDATE tds_campaigns
          SET name = $1, slug = $2, default_url = $3, click_limit = $4, start_date = $5, end_date = $6,
-             block_bots = $7, is_active = $8, updated_at = CURRENT_TIMESTAMP
-         WHERE id = $9
+             block_bots = $7, vpn_gate_enabled = $8, is_active = $9, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $10
          RETURNING *`,
-        [payload.name, payload.slug, payload.default_url, payload.click_limit, payload.start_date, payload.end_date, payload.block_bots, payload.is_active, id]
+        [payload.name, payload.slug, payload.default_url, payload.click_limit, payload.start_date, payload.end_date, payload.block_bots, payload.vpn_gate_enabled, payload.is_active, id]
       );
 
       if (!updateResult.rows.length) {
@@ -499,10 +500,10 @@ function buildAdminRoutes(pool) {
       await client.query('BEGIN');
       const newSlug = `${source.slug}-${generateSlug().slice(0, 4)}`.slice(0, 60);
       const campaignResult = await client.query(
-        `INSERT INTO tds_campaigns (name, slug, default_url, click_limit, start_date, end_date, block_bots, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, false)
+        `INSERT INTO tds_campaigns (name, slug, default_url, click_limit, start_date, end_date, block_bots, vpn_gate_enabled, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false)
          RETURNING *`,
-        [`${source.name} copy`, newSlug, source.default_url, source.click_limit, source.start_date, source.end_date, source.block_bots]
+        [`${source.name} copy`, newSlug, source.default_url, source.click_limit, source.start_date, source.end_date, source.block_bots, source.vpn_gate_enabled]
       );
 
       for (const link of sourceLinks.rows) {

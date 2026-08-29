@@ -691,6 +691,11 @@
     .switch input:checked { background: var(--green); }
     .switch input:checked::after { transform: translateX(16px); }
     .switch input:focus-visible { box-shadow: var(--focus); }
+    .switch.wide { grid-column: 1 / -1; }
+    .switch-copy { display: grid; gap: 2px; }
+    .switch-copy strong { color: var(--ink-strong); font-size: 13px; }
+    .switch-copy small { color: var(--muted); font-size: 11px; font-weight: 500; line-height: 1.35; }
+    .campaign-vpn-pill { margin-left: 6px; vertical-align: middle; }
 
     .rules-header {
       margin-top: 22px;
@@ -1197,6 +1202,10 @@
         <div class="switch-grid switch-gap">
           <label class="switch"><span>Активна</span><input id="campaignActive" type="checkbox" checked></label>
           <label class="switch"><span>Блокировать ботов</span><input id="campaignBlockBots" type="checkbox" checked></label>
+          <label class="switch wide">
+            <span class="switch-copy"><strong>VPN-прелендинг</strong><small>Перед редиректом попросить пользователя отключить VPN и повторно определить GEO</small></span>
+            <input id="campaignVpnGate" type="checkbox">
+          </label>
         </div>
         <div class="rules-header">
           <h3 class="eyebrow">GEO правила</h3>
@@ -1606,7 +1615,7 @@
       $('campaignsTable').innerHTML = `<table>
         <thead><tr><th>Campaign</th><th>Status</th><th>Rules</th><th>Clicks</th><th>24h</th><th>Default URL</th><th class="right">Actions</th></tr></thead>
         <tbody>${list.map((campaign) => `<tr>
-          <td><strong>${escapeHtml(campaign.name)}</strong><div class="mono muted">/${escapeHtml(campaign.slug)}</div></td>
+          <td><strong>${escapeHtml(campaign.name)}</strong><div class="mono muted">/${escapeHtml(campaign.slug)}${campaign.vpn_gate_enabled ? '<span class="pill info campaign-vpn-pill">VPN gate</span>' : ''}</div></td>
           <td><span class="pill ${campaign.is_active ? 'on' : 'off'}">${campaign.is_active ? 'active' : 'paused'}</span></td>
           <td class="mono">${Number(campaign.link_count || 0)}</td>
           <td class="mono">${Number(campaign.click_count || 0)}</td>
@@ -1805,6 +1814,7 @@
       $('campaignClickLimit').value = '';
       $('campaignActive').checked = true;
       $('campaignBlockBots').checked = true;
+      $('campaignVpnGate').checked = false;
       $('campaignRules').innerHTML = '';
       addRule(defaultRule());
       openModal('campaignModal');
@@ -1822,6 +1832,7 @@
       $('campaignClickLimit').value = campaign.click_limit || '';
       $('campaignActive').checked = campaign.is_active !== false;
       $('campaignBlockBots').checked = campaign.block_bots !== false;
+      $('campaignVpnGate').checked = campaign.vpn_gate_enabled === true;
       $('campaignRules').innerHTML = '';
       (asArray(data.links).length ? data.links : [defaultRule()]).forEach(addRule);
     }
@@ -1836,6 +1847,7 @@
         end_date: null,
         is_active: $('campaignActive').checked,
         block_bots: $('campaignBlockBots').checked,
+        vpn_gate_enabled: $('campaignVpnGate').checked,
         links: collectRules(),
       };
     }

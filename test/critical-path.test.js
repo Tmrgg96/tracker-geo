@@ -157,6 +157,103 @@ test('GET /go routes a trusted US proxy IP to the US rule and records it before 
   }
 });
 
+test('VPN gate preserves tracking params and routes by the fresh IP only after confirmation', async () => {
+  const inserts = [];
+  const pool = {
+    async query(sql, params = []) {
+      if (sql.includes('SELECT * FROM tds_campaigns')) {
+        return {
+          rows: [{
+            id: 21,
+            name: 'RU VPN gate test',
+            slug: 'ru-vpn-test',
+            default_url: 'https://offer.example/default',
+            click_limit: null,
+            start_date: null,
+            end_date: null,
+            block_bots: false,
+            vpn_gate_enabled: true,
+            is_active: true,
+          }],
+        };
+      }
+      if (sql.includes('SELECT 1') && sql.includes('FROM tds_clicks')) return { rows: [] };
+      if (sql.includes('FROM tds_campaign_links')) {
+        assert.equal(params[1], 'RU');
+        return {
+          rows: [{
+            id: 2,
+            url: 'https://offer.example/ru',
+            weight: 100,
+            country_code: 'RU',
+            device_type: 'all',
+            offer_id: 8,
+            offer_name: 'RU offer',
+          }],
+        };
+      }
+      if (sql.includes('INSERT INTO tds_clicks')) {
+        inserts.push(params);
+        return { rows: [] };
+      }
+      throw new Error(`Unexpected SQL in VPN gate test: ${sql.slice(0, 80)}`);
+    },
+  };
+
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(buildPublicRoutes(pool));
+  const server = http.createServer(app);
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  try {
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    const initialResponse = await fetch(`${origin}/go/ru-vpn-test?utm_source=telegram&sub_id_1=creative-42`, {
+      redirect: 'manual',
+      headers: {
+        'user-agent': 'Mozilla/5.0 Chrome/126.0.0.0 Safari/537.36',
+        'x-forwarded-for': '8.8.8.8',
+      },
+    });
+
+    assert.equal(initialResponse.status, 200);
+    assert.match(initialResponse.headers.get('content-type'), /^text\/html/);
+    assert.match(initialResponse.headers.get('cache-control'), /no-store/);
+    const html = await initialResponse.text();
+    assert.match(html, /Отключите VPN перед продолжением/);
+    assert.equal(inserts.length, 0);
+
+    const href = html.match(/id="continueButton" href="([^"]+)"/)[1].replaceAll('&amp;', '&');
+    const continueUrl = new URL(href, origin);
+    assert.equal(continueUrl.searchParams.get('utm_source'), 'telegram');
+    assert.equal(continueUrl.searchParams.get('sub_id_1'), 'creative-42');
+    assert.equal(continueUrl.searchParams.get('__vpn_checked'), '1');
+
+    const redirectResponse = await fetch(continueUrl, {
+      redirect: 'manual',
+      headers: {
+        'user-agent': 'Mozilla/5.0 Chrome/126.0.0.0 Safari/537.36',
+        'x-forwarded-for': '77.88.8.8',
+      },
+    });
+
+    assert.equal(redirectResponse.status, 302);
+    const location = redirectResponse.headers.get('location');
+    assert.match(location, /^https:\/\/offer\.example\/ru\?subid=/);
+    assert.equal(inserts.length, 1);
+    assert.equal(inserts[0][4], 'RU');
+    assert.equal(inserts[0][5], '77.88.8.8');
+    assert.equal(inserts[0][11], 'telegram');
+    assert.equal(inserts[0][17], 'creative-42');
+    const storedParams = JSON.parse(inserts[0][34]);
+    assert.equal(storedParams.utm_source, 'telegram');
+    assert.equal(storedParams.sub_id_1, 'creative-42');
+    assert.equal(storedParams.__vpn_checked, undefined);
+  } finally {
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
 function mockResponse() {
   return {
     headers: {},
